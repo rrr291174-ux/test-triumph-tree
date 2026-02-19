@@ -28,7 +28,11 @@ const subjects: Subject[] = [
   { id: "perspective", name: "Perspective", icon: Lightbulb, colorClass: "text-subject-perspective", bgClass: "bg-subject-perspective/15", tests: 10, notes: 7 },
 ];
 
-export function SubjectGrid() {
+interface SubjectGridProps {
+  examType?: string;
+}
+
+export function SubjectGrid({ examType }: SubjectGridProps) {
   return (
     <div className="px-4 pb-4">
       <h2 className="font-heading font-bold text-lg mb-3 text-foreground">📚 Subjects</h2>
