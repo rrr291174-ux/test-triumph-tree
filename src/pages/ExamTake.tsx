@@ -253,7 +253,7 @@ export default function ExamTake() {
 
         {/* Question text */}
         <div className="rounded-2xl p-5 mb-4 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 shadow-lg">
-          <p className="font-extrabold text-xl text-white whitespace-pre-wrap leading-relaxed tracking-tight">
+          <p className="font-extrabold text-2xl text-white whitespace-pre-wrap leading-relaxed tracking-tight">
             {q.question_text}
           </p>
         </div>
@@ -285,7 +285,7 @@ export default function ExamTake() {
                   }`}>
                     {String.fromCharCode(97 + i)}
                   </span>
-                  <span className={`text-base font-bold leading-snug ${selected ? "text-white" : g.text}`}>
+                  <span className={`text-lg font-bold leading-snug ${selected ? "text-white" : g.text}`}>
                     {opt}
                   </span>
                   {selected && <CheckCircle className="h-5 w-5 text-white ml-auto shrink-0" />}
