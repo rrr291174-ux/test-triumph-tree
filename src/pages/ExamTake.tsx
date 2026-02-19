@@ -417,7 +417,7 @@ export default function ExamTake() {
 
       {/* ── SUBMIT CONFIRMATION ── */}
       {showSubmitConfirm && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm px-4 pb-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-card rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-border/50">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-heading font-bold text-lg text-foreground">Submit Quiz?</h3>
