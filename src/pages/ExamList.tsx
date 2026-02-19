@@ -31,13 +31,14 @@ export default function ExamList() {
       if (!subject) { setLoading(false); return; }
       setSubjectName(subject.name);
 
-      const { data: examsData } = await supabase
+      const { data: examsData, error } = await supabase
         .from("exams")
         .select("id, title, duration_minutes, total_marks, created_at")
         .eq("subject_id", subject.id)
         .eq("is_published", true)
         .order("created_at", { ascending: false });
 
+      console.log("Exams fetched:", examsData, "Error:", error, "SubjectId:", subject.id);
       setExams(examsData || []);
       setLoading(false);
     };
