@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, User, MessageCircle, TrendingUp } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/dk-logo.png";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
