@@ -11,6 +11,7 @@ import ExamList from "./pages/ExamList";
 import ExamTake from "./pages/ExamTake";
 import ExamResult from "./pages/ExamResult";
 import AdminUpload from "./pages/AdminUpload";
+import AdminExams from "./pages/AdminExams";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Progress from "./pages/Progress";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/exam/:examId" element={<ExamTake />} />
             <Route path="/exam-result/:attemptId" element={<ExamResult />} />
             <Route path="/admin/upload" element={<AdminUpload />} />
+            <Route path="/admin/exams" element={<AdminExams />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/chat" element={<Chat />} />
