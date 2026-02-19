@@ -254,34 +254,38 @@ export default function ExamResult() {
           const isCorrect = a.is_correct;
           const isSkipped = a.selected_index === null;
 
-          const headerGrad = isCorrect
-            ? "from-green-500 to-emerald-600"
+          const headerBg = isCorrect
+            ? "bg-green-100 border-l-4 border-green-500"
             : isSkipped
-            ? "from-gray-400 to-gray-500"
-            : "from-red-500 to-rose-600";
+            ? "bg-gray-100 border-l-4 border-gray-400"
+            : "bg-red-100 border-l-4 border-red-500";
 
           return (
-            <div key={a.id} className="rounded-2xl overflow-hidden shadow-md border border-border/30">
-              {/* Question header — colorful */}
+            <div key={a.id} className={`rounded-2xl overflow-hidden shadow-sm border border-border/30 ${headerBg}`}>
+              {/* Question header */}
               <button
-                className={`w-full text-left bg-gradient-to-r ${headerGrad} px-4 py-4`}
+                className="w-full text-left px-4 py-4"
                 onClick={() => setExpandedQ(isExpanded ? null : a.id)}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0 font-extrabold text-white text-sm">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-extrabold text-sm ${
+                    isCorrect ? "bg-green-500 text-white" : isSkipped ? "bg-gray-400 text-white" : "bg-red-500 text-white"
+                  }`}>
                     {i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-extrabold text-white/70 uppercase tracking-widest">
+                      <span className={`text-[10px] font-extrabold uppercase tracking-widest ${
+                        isCorrect ? "text-green-600" : isSkipped ? "text-gray-500" : "text-red-600"
+                      }`}>
                         {isCorrect ? "✓ Correct" : isSkipped ? "— Skipped" : "✗ Wrong"}
                       </span>
                     </div>
-                    <p className="text-white font-bold text-base leading-snug line-clamp-2">
+                    <p className="text-foreground font-bold text-base leading-snug line-clamp-2">
                       {a.question.question_text}
                     </p>
                   </div>
-                  <div className="shrink-0 text-white/80 mt-1">
+                  <div className={`shrink-0 mt-1 ${isCorrect ? "text-green-600" : isSkipped ? "text-gray-500" : "text-red-600"}`}>
                     {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                   </div>
                 </div>
