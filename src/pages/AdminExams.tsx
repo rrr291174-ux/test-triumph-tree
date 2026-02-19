@@ -183,6 +183,14 @@ export default function AdminExams() {
   const publishedCount = exams.filter(e => e.is_published).length;
   const unpublishedCount = exams.filter(e => !e.is_published).length;
 
+  // Group filtered exams by subject
+  const groupedBySubject = filtered.reduce<Record<string, { subjectName: string; exams: Exam[] }>>((acc, exam) => {
+    const subjectName = exam.subjects?.name ?? "Unknown Subject";
+    if (!acc[exam.subject_id]) acc[exam.subject_id] = { subjectName, exams: [] };
+    acc[exam.subject_id].exams.push(exam);
+    return acc;
+  }, {});
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
@@ -252,7 +260,7 @@ export default function AdminExams() {
           </div>
         </Link>
 
-        {/* Exam list */}
+        {/* Exam list grouped by subject */}
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="animate-spin h-8 w-8 text-primary" />
@@ -263,61 +271,72 @@ export default function AdminExams() {
             <p className="text-muted-foreground text-sm">No exams found</p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {filtered.map((exam) => (
-              <div
-                key={exam.id}
-                className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
-                        exam.is_published
-                          ? "bg-accent/15 text-accent"
-                          : "bg-muted text-muted-foreground"
-                      }`}>
-                        {exam.is_published
-                          ? <><CheckCircle className="h-3 w-3" /> Live</>
-                          : <><XCircle className="h-3 w-3" /> Hidden</>
-                        }
-                      </span>
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                        {exam.subjects?.name ?? "Unknown Subject"}
-                      </span>
+          <div className="space-y-4">
+            {Object.entries(groupedBySubject).map(([subjectId, group]) => (
+              <div key={subjectId}>
+                {/* Subject header */}
+                <div className="flex items-center gap-2 mb-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-primary" />
+                  <h2 className="font-heading font-bold text-sm text-foreground">{group.subjectName}</h2>
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                    {group.exams.length} exam{group.exams.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {group.exams.map((exam) => (
+                    <div
+                      key={exam.id}
+                      className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
+                              exam.is_published
+                                ? "bg-accent/15 text-accent"
+                                : "bg-muted text-muted-foreground"
+                            }`}>
+                              {exam.is_published
+                                ? <><CheckCircle className="h-3 w-3" /> Live</>
+                                : <><XCircle className="h-3 w-3" /> Hidden</>
+                              }
+                            </span>
+                          </div>
+                          <h3 className="font-heading font-semibold text-sm text-foreground mt-1 truncate">{exam.title}</h3>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {exam.total_marks ?? 0} questions · {exam.duration_minutes ?? 30} min
+                          </p>
+                        </div>
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => handleTogglePublish(exam)}
+                            title={exam.is_published ? "Unpublish" : "Publish"}
+                            className="p-2 rounded-xl hover:bg-muted transition-colors"
+                          >
+                            {exam.is_published
+                              ? <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              : <Eye className="h-4 w-4 text-primary" />
+                            }
+                          </button>
+                          <button
+                            onClick={() => openEdit(exam)}
+                            title="Edit"
+                            className="p-2 rounded-xl hover:bg-muted transition-colors"
+                          >
+                            <Pencil className="h-4 w-4 text-foreground" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(exam)}
+                            title="Delete"
+                            className="p-2 rounded-xl hover:bg-destructive/10 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="font-heading font-semibold text-sm text-foreground mt-1 truncate">{exam.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {exam.total_marks ?? 0} questions · {exam.duration_minutes ?? 30} min
-                    </p>
-                  </div>
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => handleTogglePublish(exam)}
-                      title={exam.is_published ? "Unpublish" : "Publish"}
-                      className="p-2 rounded-xl hover:bg-muted transition-colors"
-                    >
-                      {exam.is_published
-                        ? <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        : <Eye className="h-4 w-4 text-primary" />
-                      }
-                    </button>
-                    <button
-                      onClick={() => openEdit(exam)}
-                      title="Edit"
-                      className="p-2 rounded-xl hover:bg-muted transition-colors"
-                    >
-                      <Pencil className="h-4 w-4 text-foreground" />
-                    </button>
-                    <button
-                      onClick={() => setDeleteTarget(exam)}
-                      title="Delete"
-                      className="p-2 rounded-xl hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </button>
-                  </div>
+                  ))}
                 </div>
               </div>
             ))}
