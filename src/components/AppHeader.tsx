@@ -25,7 +25,7 @@ export function AppHeader() {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="DK Study Hub" className="h-9 w-9 rounded-lg" />
             <span className="font-heading font-bold text-lg text-primary-foreground tracking-tight">
-              DK STUDY HUB
+              DK STUDY ZONE
             </span>
           </Link>
           <Link
