@@ -13,7 +13,7 @@ export function AppHeader() {
   const location = useLocation();
 
   // Hide header/nav on exam taking page and auth page — full screen mode
-  const hideNav = location.pathname.startsWith("/exam/") || location.pathname === "/auth";
+  const hideNav = location.pathname.startsWith("/exam/") || location.pathname.startsWith("/exam-result/") || location.pathname === "/auth";
 
   if (hideNav) return null;
 
