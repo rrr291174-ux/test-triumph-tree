@@ -21,10 +21,10 @@ export function AppHeader() {
     <>
       {/* Top Header */}
       <header className="sticky top-0 z-50 gradient-hero shadow-primary">
-        <div className="container flex items-center justify-between h-16 px-4">
+        <div className="container flex items-center justify-between h-14 px-4">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="DK Study Zone" className="h-13 w-13 rounded-xl" />
-            <span className="font-heading font-bold text-2xl text-primary-foreground tracking-tight">
+            <img src={logo} alt="DK Study Zone" className="h-10 w-10 rounded-xl object-cover" />
+            <span className="font-heading font-bold text-xl text-primary-foreground tracking-tight">
               DK STUDY ZONE
             </span>
           </Link>
