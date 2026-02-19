@@ -252,8 +252,8 @@ export default function ExamTake() {
         </div>
 
         {/* Question text */}
-        <div className="bg-card rounded-2xl p-5 shadow-card border border-border/50 mb-4">
-          <p className="font-semibold text-base text-foreground whitespace-pre-wrap leading-relaxed">
+        <div className="rounded-2xl p-5 mb-4 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 shadow-lg">
+          <p className="font-extrabold text-xl text-white whitespace-pre-wrap leading-relaxed tracking-tight">
             {q.question_text}
           </p>
         </div>
