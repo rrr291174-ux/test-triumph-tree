@@ -3,8 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Clock, ChevronLeft, ChevronRight, Flag, BookOpen, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  Loader2, Clock, ChevronLeft, ChevronRight, Flag,
+  BookOpen, CheckCircle, Bookmark, BookmarkCheck, X
+} from "lucide-react";
 
 interface Question {
   id: string;
@@ -21,12 +23,28 @@ interface ExamInfo {
   total_marks: number;
 }
 
+// Question states (matching Telegram bot)
+type QState = "unvisited" | "not-answered" | "answered" | "marked" | "answered-marked";
+
 const OPTION_COLORS = [
   { border: "border-blue-400", bg: "bg-blue-50", selectedBg: "bg-blue-500", label: "bg-blue-400", text: "text-blue-700" },
   { border: "border-violet-400", bg: "bg-violet-50", selectedBg: "bg-violet-500", label: "bg-violet-400", text: "text-violet-700" },
   { border: "border-emerald-400", bg: "bg-emerald-50", selectedBg: "bg-emerald-500", label: "bg-emerald-400", text: "text-emerald-700" },
   { border: "border-orange-400", bg: "bg-orange-50", selectedBg: "bg-orange-500", label: "bg-orange-400", text: "text-orange-700" },
 ];
+
+// Palette button state styles (matching bot colors)
+function getPaletteStyle(state: QState, isCurrent: boolean): string {
+  const base = "w-11 h-11 rounded-xl font-bold text-xs text-white transition-all active:scale-90 flex items-center justify-center shrink-0 relative";
+  const current = isCurrent ? " ring-2 ring-violet-400 ring-offset-1 scale-110 shadow-lg" : "";
+  switch (state) {
+    case "answered":        return `${base} bg-gradient-to-b from-emerald-400 to-emerald-600${current}`;
+    case "not-answered":    return `${base} bg-gradient-to-b from-red-400 to-red-600${current}`;
+    case "marked":          return `${base} bg-gradient-to-b from-cyan-400 to-cyan-600${current}`;
+    case "answered-marked": return `${base} bg-gradient-to-b from-emerald-400 to-cyan-500${current}`;
+    default:                return `${base} bg-gradient-to-b from-gray-400 to-gray-500${current}`;
+  }
+}
 
 export default function ExamTake() {
   const { examId } = useParams();
@@ -37,11 +55,14 @@ export default function ExamTake() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
+  const [visited, setVisited] = useState<Set<number>>(new Set([0]));
+  const [marked, setMarked] = useState<Set<number>>(new Set());
   const [timeLeft, setTimeLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [startTime] = useState(Date.now());
   const [showPalette, setShowPalette] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -76,9 +97,16 @@ export default function ExamTake() {
     fetchExam();
   }, [examId, user, navigate]);
 
+  // Mark current question as visited when navigating
+  const goToQuestion = useCallback((index: number) => {
+    setVisited(prev => { const n = new Set(prev); n.add(index); return n; });
+    setCurrentQ(index);
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     if (submitting || !user) return;
     setSubmitting(true);
+    setShowSubmitConfirm(false);
     const timeTaken = Math.round((Date.now() - startTime) / 1000);
 
     let correct = 0, wrong = 0, unanswered = 0;
@@ -139,6 +167,19 @@ export default function ExamTake() {
     return () => clearInterval(interval);
   }, [loading, handleSubmit, timeLeft]);
 
+  // Compute question state for palette
+  function getQState(index: number): QState {
+    const q = questions[index];
+    if (!q) return "unvisited";
+    const hasAns = answers[q.id] !== undefined && answers[q.id] !== null;
+    const isMark = marked.has(index);
+    if (isMark && hasAns) return "answered-marked";
+    if (isMark) return "marked";
+    if (hasAns) return "answered";
+    if (visited.has(index)) return "not-answered";
+    return "unvisited";
+  }
+
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
       <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-primary animate-pulse">
@@ -159,6 +200,8 @@ export default function ExamTake() {
   const progress = ((currentQ + 1) / questions.length) * 100;
   const isLowTime = timeLeft < 60;
   const isWarningTime = timeLeft < 300;
+  const isMarked = marked.has(currentQ);
+  const isAnswered = answers[q.id] !== undefined && answers[q.id] !== null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -199,20 +242,25 @@ export default function ExamTake() {
         <div className="flex items-center justify-between mt-2 text-[10px] text-muted-foreground font-medium">
           <span>Q {currentQ + 1} / {questions.length}</span>
           <span className="text-accent font-semibold">{answered} answered ✓</span>
-          <span>{questions.length - answered} remaining</span>
+          <span>{marked.size > 0 ? `${marked.size} marked 🔖` : `${questions.length - answered} remaining`}</span>
         </div>
       </div>
 
       {/* Question Card */}
       <div className="flex-1 px-4 pt-4 pb-2 overflow-y-auto">
-        {/* Question number badge */}
-        <div className="flex items-center gap-2 mb-3">
+        {/* Question number badge + status */}
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
           <span className="gradient-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-primary">
             Question {currentQ + 1}
           </span>
-          {answers[q.id] !== undefined && (
+          {isAnswered && (
             <span className="bg-accent/15 text-accent text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
               <CheckCircle className="h-3 w-3" /> Answered
+            </span>
+          )}
+          {isMarked && (
+            <span className="bg-cyan-100 text-cyan-700 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Bookmark className="h-3 w-3" /> Marked
             </span>
           )}
         </div>
@@ -241,19 +289,16 @@ export default function ExamTake() {
                 }`}
               >
                 <div className="flex items-center gap-3 p-4">
-                  {/* Option label */}
                   <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 text-white ${
                     selected ? "bg-white/25" : color.label
                   }`}>
                     {String.fromCharCode(65 + i)}
                   </span>
-                  {/* Option text */}
                   <span className={`text-sm font-medium leading-snug ${
                     selected ? "text-white" : color.text
                   }`}>
                     {opt}
                   </span>
-                  {/* Selected indicator */}
                   {selected && (
                     <CheckCircle className="h-5 w-5 text-white ml-auto shrink-0" />
                   )}
@@ -266,40 +311,47 @@ export default function ExamTake() {
 
       {/* Bottom Navigation */}
       <div className="sticky bottom-0 bg-card border-t-2 border-border px-4 pt-3 pb-5 space-y-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-        {/* Question palette toggle */}
+
+        {/* Question palette toggle + legend */}
         <button
           onClick={() => setShowPalette(!showPalette)}
-          className="w-full text-center text-xs text-muted-foreground font-semibold py-1.5 hover:text-primary transition-colors flex items-center justify-center gap-1"
+          className="w-full text-center text-xs text-muted-foreground font-semibold py-1 hover:text-primary transition-colors flex items-center justify-center gap-1"
         >
           <span>{showPalette ? "▲ Hide Palette" : "▼ Question Palette"}</span>
         </button>
 
         {showPalette && (
-          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto py-1">
-            {questions.map((qq, i) => (
-              <button
-                key={i}
-                onClick={() => { setCurrentQ(i); setShowPalette(false); }}
-                className={`w-9 h-9 rounded-xl text-xs font-bold shrink-0 transition-all ${
-                  i === currentQ
-                    ? "gradient-primary text-white scale-110 shadow-primary"
-                    : answers[qq.id] !== undefined
-                    ? "bg-accent text-white"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
+          <div className="space-y-2">
+            {/* Legend */}
+            <div className="flex flex-wrap gap-1.5 justify-center text-[10px] font-semibold">
+              <span className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">● Answered</span>
+              <span className="flex items-center gap-1 bg-red-100 text-red-600 px-2 py-0.5 rounded-full">● Not Answered</span>
+              <span className="flex items-center gap-1 bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">● Not Visited</span>
+              <span className="flex items-center gap-1 bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">● Marked</span>
+            </div>
+
+            {/* Palette grid */}
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto py-1 justify-start">
+              {questions.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { goToQuestion(i); setShowPalette(false); }}
+                  className={getPaletteStyle(getQState(i), i === currentQ)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Prev / Next / Submit — BIG BUTTONS */}
-        <div className="flex items-center gap-3">
+        {/* Action buttons row */}
+        <div className="flex items-center gap-2">
+          {/* Prev */}
           <button
-            onClick={() => setCurrentQ((c) => Math.max(0, c - 1))}
+            onClick={() => { goToQuestion(Math.max(0, currentQ - 1)); }}
             disabled={currentQ === 0}
-            className={`flex items-center justify-center gap-2 h-14 px-6 rounded-2xl border-2 font-bold text-base transition-all active:scale-95 ${
+            className={`flex items-center justify-center gap-1 h-14 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-95 ${
               currentQ === 0
                 ? "border-muted text-muted-foreground bg-muted/30 opacity-40 cursor-not-allowed"
                 : "border-primary text-primary bg-primary/5 hover:bg-primary/10"
@@ -309,30 +361,102 @@ export default function ExamTake() {
             <span>Prev</span>
           </button>
 
+          {/* Mark for Review */}
+          <button
+            onClick={() => {
+              setMarked(prev => {
+                const n = new Set(prev);
+                if (n.has(currentQ)) n.delete(currentQ); else n.add(currentQ);
+                return n;
+              });
+            }}
+            className={`flex items-center justify-center gap-1.5 h-14 px-3 rounded-2xl border-2 font-bold text-xs transition-all active:scale-95 ${
+              isMarked
+                ? "bg-cyan-500 border-cyan-500 text-white shadow-md"
+                : "bg-cyan-50 border-cyan-300 text-cyan-700 hover:bg-cyan-100"
+            }`}
+          >
+            {isMarked ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            <span className="leading-tight">{isMarked ? "Marked" : "Mark"}</span>
+          </button>
+
           <div className="flex-1" />
 
+          {/* Next or Submit */}
           {currentQ < questions.length - 1 ? (
             <button
-              onClick={() => setCurrentQ((c) => c + 1)}
-              className="flex items-center justify-center gap-2 h-14 px-8 rounded-2xl font-bold text-base text-white gradient-primary shadow-primary active:scale-95 transition-all"
+              onClick={() => goToQuestion(currentQ + 1)}
+              className="flex items-center justify-center gap-1 h-14 px-5 rounded-2xl font-bold text-sm text-white gradient-primary shadow-primary active:scale-95 transition-all"
             >
               <span>Next</span>
               <ChevronRight className="h-5 w-5" />
             </button>
           ) : (
             <button
-              onClick={handleSubmit}
+              onClick={() => setShowSubmitConfirm(true)}
               disabled={submitting}
-              className="flex items-center justify-center gap-2 h-14 px-8 rounded-2xl font-bold text-base text-white bg-accent hover:bg-accent/90 shadow-lg active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 h-14 px-5 rounded-2xl font-bold text-sm text-white bg-accent hover:bg-accent/90 shadow-lg active:scale-95 transition-all disabled:opacity-60"
             >
               {submitting
-                ? <><Loader2 className="h-5 w-5 animate-spin" /> Submitting...</>
-                : <><Flag className="h-5 w-5" /> Submit Exam</>
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>
+                : <><Flag className="h-4 w-4" /> Submit</>
               }
             </button>
           )}
         </div>
       </div>
+
+      {/* Submit Confirmation Modal */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm px-4 pb-6">
+          <div className="bg-card rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-border/50 animate-in slide-in-from-bottom-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-heading font-bold text-lg text-foreground">Submit Exam?</h3>
+              <button onClick={() => setShowSubmitConfirm(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80">
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Summary */}
+            <div className="grid grid-cols-3 gap-2 mb-5">
+              <div className="bg-accent/10 rounded-2xl p-3 text-center">
+                <div className="font-heading font-bold text-xl text-accent">{answered}</div>
+                <div className="text-[10px] text-muted-foreground font-semibold">Answered</div>
+              </div>
+              <div className="bg-destructive/10 rounded-2xl p-3 text-center">
+                <div className="font-heading font-bold text-xl text-destructive">{questions.length - answered}</div>
+                <div className="text-[10px] text-muted-foreground font-semibold">Unanswered</div>
+              </div>
+              <div className="bg-cyan-50 rounded-2xl p-3 text-center">
+                <div className="font-heading font-bold text-xl text-cyan-600">{marked.size}</div>
+                <div className="text-[10px] text-muted-foreground font-semibold">Marked</div>
+              </div>
+            </div>
+
+            {questions.length - answered > 0 && (
+              <p className="text-xs text-orange-600 bg-orange-50 rounded-xl px-3 py-2 mb-4 font-medium">
+                ⚠️ {questions.length - answered} questions unanswered. Sure you want to submit?
+              </p>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSubmitConfirm(false)}
+                className="flex-1 h-13 py-3.5 rounded-2xl border-2 border-border text-foreground font-bold text-sm hover:bg-muted/50 transition-all"
+              >
+                Go Back
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex-1 h-13 py-3.5 rounded-2xl gradient-primary text-white font-bold text-sm shadow-primary active:scale-95 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</> : <><Flag className="h-4 w-4" /> Submit</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
