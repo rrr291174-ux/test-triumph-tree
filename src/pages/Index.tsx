@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { StateSelector } from "@/components/StateSelector";
 import { SubjectGrid } from "@/components/SubjectGrid";
-import { HeroBanner } from "@/components/HeroBanner";
-import { ChevronRight, GraduationCap } from "lucide-react";
+import { ChevronRight, GraduationCap, BookOpen, Trophy, Video, ArrowRight } from "lucide-react";
+import dkLogo from "@/assets/dk-logo.png";
 
 const examTypes = [
   {
@@ -10,19 +10,25 @@ const examTypes = [
     label: "SA",
     fullName: "School Assistant",
     emoji: "🎓",
-    color: "border-blue-400 bg-blue-50",
-    activeColor: "border-blue-500 bg-blue-500 text-white",
-    textColor: "text-blue-700",
+    gradient: "from-blue-500 to-indigo-600",
+    lightBg: "bg-blue-50 border-blue-200",
+    activeBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
   },
   {
     id: "sgt",
     label: "SGT",
     fullName: "Secondary Grade Teacher",
     emoji: "📖",
-    color: "border-emerald-400 bg-emerald-50",
-    activeColor: "border-emerald-500 bg-emerald-500 text-white",
-    textColor: "text-emerald-700",
+    gradient: "from-emerald-500 to-teal-600",
+    lightBg: "bg-emerald-50 border-emerald-200",
+    activeBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
   },
+];
+
+const stats = [
+  { value: "50+", label: "Test Series", icon: Trophy, color: "text-orange-500", bg: "bg-orange-50" },
+  { value: "200+", label: "Notes", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-50" },
+  { value: "100+", label: "Classes", icon: Video, color: "text-emerald-500", bg: "bg-emerald-50" },
 ];
 
 const Index = () => {
@@ -31,40 +37,69 @@ const Index = () => {
 
   const handleStateSelect = (stateId: string) => {
     setSelectedState(stateId);
-    setSelectedExamType(null); // reset exam type on state change
+    setSelectedExamType(null);
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <HeroBanner />
+    <div className="min-h-screen bg-background pb-24">
 
-      {/* Quick Stats */}
-      <div className="px-4 mb-4">
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center">
-            <div className="font-heading font-bold text-lg text-primary">50+</div>
-            <div className="text-[10px] text-muted-foreground">Test Series</div>
-          </div>
-          <div className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center">
-            <div className="font-heading font-bold text-lg text-secondary">200+</div>
-            <div className="text-[10px] text-muted-foreground">Notes</div>
-          </div>
-          <div className="bg-card rounded-xl p-3 shadow-card border border-border/50 text-center">
-            <div className="font-heading font-bold text-lg text-accent">100+</div>
-            <div className="text-[10px] text-muted-foreground">Classes</div>
+      {/* Hero Section */}
+      <div className="gradient-hero px-4 pt-5 pb-8 relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
+        <div className="absolute top-10 -right-4 w-20 h-20 rounded-full bg-white/10" />
+        <div className="absolute -bottom-6 -left-6 w-28 h-28 rounded-full bg-white/10" />
+
+        <div className="flex items-center gap-4 relative z-10">
+          <img src={dkLogo} alt="DK Study Zone" className="h-20 w-20 rounded-2xl shadow-xl border-2 border-white/30" />
+          <div>
+            <h1 className="font-heading font-extrabold text-2xl text-white leading-tight">
+              DK Study Zone
+            </h1>
+            <p className="text-white/80 text-xs mt-1 leading-relaxed">
+              AP & TS Competitive Exam<br />Preparation Platform
+            </p>
+            <div className="mt-2 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1 w-fit">
+              <span className="text-[10px] text-white font-semibold">🎯 Ace Your Exams!</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Step 1: State Selection */}
-      <StateSelector selected={selectedState} onSelect={handleStateSelect} />
+      {/* Stats Row */}
+      <div className="px-4 -mt-5 mb-5">
+        <div className="grid grid-cols-3 gap-2">
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-card rounded-2xl p-3 shadow-card border border-border/50 text-center">
+              <div className={`w-8 h-8 ${stat.bg} rounded-xl flex items-center justify-center mx-auto mb-1`}>
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              </div>
+              <div className={`font-heading font-extrabold text-lg ${stat.color} leading-none`}>{stat.value}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Step 2: Exam Type (SA / SGT) — shown only after state selected */}
+      {/* Step 1: State Selection */}
+      <div className="px-4 mb-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">1</span>
+          </div>
+          <h2 className="font-heading font-bold text-sm text-foreground">Select Your State</h2>
+        </div>
+        <StateSelector selected={selectedState} onSelect={handleStateSelect} />
+      </div>
+
+      {/* Step 2: Exam Type */}
       {selectedState && (
-        <div className="px-4 pb-4 animate-slide-up">
+        <div className="px-4 mb-5 animate-slide-up">
           <div className="flex items-center gap-2 mb-3">
-            <GraduationCap className="h-4 w-4 text-primary" />
-            <h2 className="font-heading font-semibold text-sm text-foreground">Select Exam Type</h2>
+            <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
+              <span className="text-white text-[10px] font-bold">2</span>
+            </div>
+            <h2 className="font-heading font-bold text-sm text-foreground">Select Exam Type</h2>
           </div>
           <div className="flex gap-3">
             {examTypes.map((et) => {
@@ -73,22 +108,32 @@ const Index = () => {
                 <button
                   key={et.id}
                   onClick={() => setSelectedExamType(et.id)}
-                  className={`flex-1 flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200 ${
+                  className={`flex-1 relative overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
                     isActive
-                      ? et.activeColor + " shadow-md scale-[1.02]"
-                      : et.color + " hover:scale-[1.01]"
+                      ? "border-transparent shadow-lg scale-[1.03]"
+                      : "border-border bg-card shadow-card hover:scale-[1.02]"
                   }`}
                 >
-                  <span className="text-2xl">{et.emoji}</span>
-                  <div className="text-left">
-                    <div className={`font-heading font-bold text-sm ${isActive ? "text-white" : et.textColor}`}>
-                      {et.label}
+                  {isActive && (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${et.gradient}`} />
+                  )}
+                  <div className="relative z-10 p-4 flex flex-col items-center gap-2">
+                    <span className="text-3xl">{et.emoji}</span>
+                    <div>
+                      <div className={`font-heading font-extrabold text-xl ${isActive ? "text-white" : "text-foreground"}`}>
+                        {et.label}
+                      </div>
+                      <div className={`text-[10px] ${isActive ? "text-white/80" : "text-muted-foreground"} text-center leading-tight`}>
+                        {et.fullName}
+                      </div>
                     </div>
-                    <div className={`text-[10px] ${isActive ? "text-white/80" : "text-muted-foreground"}`}>
-                      {et.fullName}
-                    </div>
+                    {isActive && (
+                      <div className="flex items-center gap-1 bg-white/25 rounded-full px-2 py-0.5">
+                        <span className="text-[9px] text-white font-bold">Selected</span>
+                        <ChevronRight className="h-3 w-3 text-white" />
+                      </div>
+                    )}
                   </div>
-                  {isActive && <ChevronRight className="h-4 w-4 ml-auto text-white" />}
                 </button>
               );
             })}
@@ -96,10 +141,33 @@ const Index = () => {
         </div>
       )}
 
-      {/* Step 3: Subjects — shown only after exam type selected */}
+      {/* Step 3: Subjects */}
       {selectedState && selectedExamType && (
         <div className="animate-slide-up">
+          <div className="px-4 mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
+                <span className="text-white text-[10px] font-bold">3</span>
+              </div>
+              <h2 className="font-heading font-bold text-sm text-foreground">Choose Subject</h2>
+            </div>
+            <div className="flex items-center gap-1 text-primary">
+              <GraduationCap className="h-3 w-3" />
+              <span className="text-[10px] font-bold uppercase">{selectedExamType}</span>
+            </div>
+          </div>
           <SubjectGrid examType={selectedExamType} />
+        </div>
+      )}
+
+      {/* Empty state when nothing selected */}
+      {!selectedState && (
+        <div className="px-4 mt-4">
+          <div className="bg-card rounded-2xl p-6 border border-dashed border-border text-center">
+            <div className="text-4xl mb-2">👆</div>
+            <p className="text-sm text-muted-foreground font-medium">మీ state select చేయండి</p>
+            <p className="text-xs text-muted-foreground mt-1">AP లేదా Telangana ని choose చేయండి</p>
+          </div>
         </div>
       )}
     </div>
