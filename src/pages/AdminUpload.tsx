@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Upload, FileJson, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 interface QuestionJSON {
@@ -20,6 +20,7 @@ interface SubjectOption {
 
 export default function AdminUpload() {
   const { user, isAdmin, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState<SubjectOption[]>([]);
   const [selectedSubject, setSelectedSubject] = useState("");
   const [examTitle, setExamTitle] = useState("");
@@ -84,11 +85,12 @@ export default function AdminUpload() {
 
   const handleUpload = async () => {
     if (!jsonData || !selectedSubject || !examTitle.trim()) {
-      toast({ title: "Missing Info", description: "Please select subject and enter exam title", variant: "destructive" });
+      toast({ title: "Missing Info", description: "Subject select చేయండి మరియు Exam Title రాయండి", variant: "destructive" });
       return;
     }
 
     setUploading(true);
+    setResult(null);
     try {
       // Create exam
       const { data: exam, error: examErr } = await supabase
@@ -98,36 +100,52 @@ export default function AdminUpload() {
           title: examTitle.trim(),
           duration_minutes: durationMinutes,
           total_marks: jsonData.length,
-          created_by: user.id,
+          created_by: user!.id,
+          is_published: false,
         })
         .select("id")
         .single();
 
-      if (examErr) throw examErr;
+      if (examErr) {
+        console.error("Exam insert error:", examErr);
+        throw new Error(examErr.message);
+      }
 
-      // Insert all questions
-      const questions = jsonData.map((q, i) => ({
-        exam_id: exam.id,
-        question_text: q.question,
-        options: q.options,
-        answer_index: q.answer_index,
-        display_order: i + 1,
-      }));
+      if (!exam?.id) throw new Error("Exam ID not returned");
 
-      const { error: qErr } = await supabase.from("questions").insert(questions);
-      if (qErr) throw qErr;
+      // Insert questions in batches of 100
+      const BATCH_SIZE = 100;
+      for (let i = 0; i < jsonData.length; i += BATCH_SIZE) {
+        const batch = jsonData.slice(i, i + BATCH_SIZE).map((q, j) => ({
+          exam_id: exam.id,
+          question_text: q.question,
+          options: q.options,
+          answer_index: q.answer_index,
+          display_order: i + j + 1,
+        }));
+        const { error: qErr } = await supabase.from("questions").insert(batch);
+        if (qErr) {
+          console.error("Questions insert error:", qErr);
+          throw new Error(qErr.message);
+        }
+      }
 
       setResult({ success: true, count: jsonData.length });
-      toast({ title: "🎉 Upload Successful!", description: `${jsonData.length} questions added to "${examTitle}"` });
-      
-      // Reset
+      toast({ title: "🎉 Upload Successful!", description: `${jsonData.length} questions added! Publish చేయడానికి Manage Exams కి వెళ్ళండి.` });
+
+      // Reset form
       setJsonData(null);
       setFileName("");
       setExamTitle("");
+      setSelectedSubject("");
       if (fileRef.current) fileRef.current.value = "";
+
+      // Redirect to manage exams after 2 seconds
+      setTimeout(() => navigate("/admin/exams"), 2000);
     } catch (err: any) {
+      console.error("Upload error:", err);
       setResult({ success: false, count: 0 });
-      toast({ title: "Upload Failed", description: err.message, variant: "destructive" });
+      toast({ title: "❌ Upload Failed", description: err.message || "Unknown error occurred", variant: "destructive" });
     }
     setUploading(false);
   };
@@ -243,10 +261,12 @@ export default function AdminUpload() {
             {result.success ? <CheckCircle className="h-6 w-6 text-accent" /> : <AlertCircle className="h-6 w-6 text-destructive" />}
             <div>
               <p className="font-semibold text-sm text-foreground">
-                {result.success ? "Upload Complete!" : "Upload Failed"}
+                {result.success ? "✅ Upload Complete!" : "❌ Upload Failed"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {result.success ? `${result.count} questions added successfully` : "Please try again"}
+                {result.success
+                  ? `${result.count} questions added. Manage Exams కి redirect అవుతోంది...`
+                  : "Error జరిగింది. Console లో details చూడండి."}
               </p>
             </div>
           </div>
