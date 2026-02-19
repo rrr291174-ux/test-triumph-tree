@@ -258,27 +258,34 @@ export default function ExamTake() {
           </p>
         </div>
 
-        {/* Options — (a) (b) (c) (d) style like bot */}
+        {/* Options — (a) (b) (c) (d) style */}
         <div className="space-y-3">
           {q.options.map((opt, i) => {
             const selected = answers[q.id] === i;
+            const optionGradients = [
+              { idle: "border-blue-300 bg-blue-50 dark:bg-blue-950/40", selected: "from-blue-500 to-blue-600", badge: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
+              { idle: "border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40", selected: "from-emerald-500 to-green-600", badge: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-300" },
+              { idle: "border-orange-300 bg-orange-50 dark:bg-orange-950/40", selected: "from-orange-500 to-amber-500", badge: "bg-orange-500", text: "text-orange-700 dark:text-orange-300" },
+              { idle: "border-violet-300 bg-violet-50 dark:bg-violet-950/40", selected: "from-violet-500 to-purple-600", badge: "bg-violet-500", text: "text-violet-700 dark:text-violet-300" },
+            ];
+            const g = optionGradients[i % optionGradients.length];
             return (
               <button
                 key={i}
                 onClick={() => setAnswers(prev => ({ ...prev, [q.id]: i }))}
                 className={`w-full text-left rounded-2xl border-2 transition-all duration-150 active:scale-[0.98] ${
                   selected
-                    ? "bg-gradient-to-r from-blue-500 to-blue-400 border-blue-600 shadow-lg"
-                    : "bg-card border-border hover:border-blue-300 hover:shadow-md"
+                    ? `bg-gradient-to-r ${g.selected} border-transparent shadow-lg`
+                    : `${g.idle} hover:shadow-md`
                 }`}
               >
                 <div className="flex items-center gap-3 px-4 py-3.5">
-                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
-                    selected ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
+                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-sm shrink-0 ${
+                    selected ? "bg-white/20 text-white" : `${g.badge} text-white`
                   }`}>
                     {String.fromCharCode(97 + i)}
                   </span>
-                  <span className={`text-sm font-medium leading-snug ${selected ? "text-white" : "text-foreground"}`}>
+                  <span className={`text-base font-bold leading-snug ${selected ? "text-white" : g.text}`}>
                     {opt}
                   </span>
                   {selected && <CheckCircle className="h-5 w-5 text-white ml-auto shrink-0" />}
