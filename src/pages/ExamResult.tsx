@@ -152,10 +152,11 @@ export default function ExamResult() {
       <div className="px-4 -mt-12 mb-4">
         <div className="bg-card rounded-3xl shadow-2xl border border-border/40 p-5">
 
-          {/* Circular accuracy ring — centered */}
-          <div className="flex justify-center mb-5">
-            <div className="relative">
-              <svg width="140" height="140" viewBox="0 0 132 132" className="-rotate-90">
+          {/* Accuracy ring + stats side by side */}
+          <div className="flex items-center gap-4 mb-2">
+            {/* Circular accuracy ring */}
+            <div className="relative shrink-0">
+              <svg width="110" height="110" viewBox="0 0 132 132" className="-rotate-90">
                 <circle cx="66" cy="66" r={radius} fill="none" strokeWidth="12" stroke="hsl(var(--muted))" />
                 <circle cx="66" cy="66" r={radius} fill="none" strokeWidth="12"
                   stroke={ringColor} strokeLinecap="round"
@@ -164,31 +165,34 @@ export default function ExamResult() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-extrabold text-3xl text-foreground leading-none">{accuracy}%</span>
-                <span className="text-xs text-muted-foreground font-bold mt-1">Accuracy</span>
+                <span className="font-extrabold text-2xl text-foreground leading-none">{accuracy}%</span>
+                <span className="text-[10px] text-muted-foreground font-bold mt-0.5">Accuracy</span>
               </div>
             </div>
-          </div>
 
-          {/* 3 stats as equal cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-yellow-50 rounded-2xl p-3 text-center border border-yellow-200">
-              <Star className="h-6 w-6 text-yellow-500 mx-auto mb-1" />
-              <div className="font-extrabold text-2xl text-yellow-600 leading-none">{attempt.correct_answers}</div>
-              <div className="text-[10px] text-yellow-700 font-bold mt-1">Score</div>
-              <div className="text-[10px] text-yellow-500">/ {attempt.total_questions}</div>
-            </div>
-            <div className="bg-blue-50 rounded-2xl p-3 text-center border border-blue-200">
-              <Clock className="h-6 w-6 text-blue-500 mx-auto mb-1" />
-              <div className="font-extrabold text-2xl text-blue-600 leading-none">{mins}m</div>
-              <div className="text-[10px] text-blue-700 font-bold mt-1">Time Taken</div>
-              <div className="text-[10px] text-blue-500">{secs}s</div>
-            </div>
-            <div className="bg-violet-50 rounded-2xl p-3 text-center border border-violet-200">
-              <BookOpen className="h-6 w-6 text-violet-500 mx-auto mb-1" />
-              <div className="font-extrabold text-2xl text-violet-600 leading-none">{attempt.total_questions}</div>
-              <div className="text-[10px] text-violet-700 font-bold mt-1">Total Qns</div>
-              <div className="text-[10px] text-violet-500">Questions</div>
+            {/* 3 stats stacked vertically */}
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="bg-yellow-50 rounded-xl px-3 py-2 border border-yellow-200 flex items-center gap-3">
+                <Star className="h-5 w-5 text-yellow-500 shrink-0" />
+                <div>
+                  <div className="font-extrabold text-lg text-yellow-600 leading-none">{attempt.correct_answers} <span className="text-xs font-bold text-yellow-400">/ {attempt.total_questions}</span></div>
+                  <div className="text-[10px] text-yellow-700 font-bold">Score</div>
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-xl px-3 py-2 border border-blue-200 flex items-center gap-3">
+                <Clock className="h-5 w-5 text-blue-500 shrink-0" />
+                <div>
+                  <div className="font-extrabold text-lg text-blue-600 leading-none">{mins}m {secs}s</div>
+                  <div className="text-[10px] text-blue-700 font-bold">Time Taken</div>
+                </div>
+              </div>
+              <div className="bg-violet-50 rounded-xl px-3 py-2 border border-violet-200 flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-violet-500 shrink-0" />
+                <div>
+                  <div className="font-extrabold text-lg text-violet-600 leading-none">{attempt.total_questions}</div>
+                  <div className="text-[10px] text-violet-700 font-bold">Total Questions</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
