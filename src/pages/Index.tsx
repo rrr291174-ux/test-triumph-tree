@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { StateSelector } from "@/components/StateSelector";
 import { SubjectGrid } from "@/components/SubjectGrid";
-import { ChevronRight, GraduationCap, BookOpen, Trophy, Video, ArrowRight } from "lucide-react";
-import dkLogo from "@/assets/dk-logo.png";
+import { ChevronRight, GraduationCap, BookOpen, Trophy, Video, Star } from "lucide-react";
 
 const examTypes = [
   {
@@ -44,23 +43,29 @@ const Index = () => {
     <div className="min-h-screen bg-background pb-24">
 
       {/* Hero Section */}
-      <div className="gradient-hero px-4 pt-5 pb-8 relative overflow-hidden">
+      <div className="gradient-hero px-4 pt-6 pb-10 relative overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
         <div className="absolute top-10 -right-4 w-20 h-20 rounded-full bg-white/10" />
         <div className="absolute -bottom-6 -left-6 w-28 h-28 rounded-full bg-white/10" />
 
-        <div className="flex items-center gap-4 relative z-10">
-          <img src={dkLogo} alt="DK Study Zone" className="h-20 w-20 rounded-2xl shadow-xl border-2 border-white/30" />
-          <div>
-            <h1 className="font-heading font-extrabold text-2xl text-white leading-tight">
-              DK Study Zone
-            </h1>
-            <p className="text-white/80 text-xs mt-1 leading-relaxed">
-              AP & TS Competitive Exam<br />Preparation Platform
-            </p>
-            <div className="mt-2 flex items-center gap-1 bg-white/20 rounded-full px-3 py-1 w-fit">
-              <span className="text-[10px] text-white font-semibold">🎯 Ace Your Exams!</span>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-1">
+            <Star className="h-4 w-4 text-yellow-300 fill-yellow-300" />
+            <span className="text-white/80 text-xs font-semibold">AP & TS Competitive Exams</span>
+          </div>
+          <h1 className="font-heading font-extrabold text-3xl text-white leading-tight">
+            Best Study<br />Platform 🎯
+          </h1>
+          <p className="text-white/75 text-xs mt-2 leading-relaxed max-w-[220px]">
+            Complete preparation with Test Series, Notes & Live Classes
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="bg-white/20 rounded-full px-3 py-1">
+              <span className="text-[10px] text-white font-bold">SA • SGT • DSC</span>
+            </div>
+            <div className="bg-yellow-400/30 rounded-full px-3 py-1">
+              <span className="text-[10px] text-yellow-200 font-bold">🏆 Trusted by 1000+</span>
             </div>
           </div>
         </div>
