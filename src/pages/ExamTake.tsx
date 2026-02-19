@@ -265,22 +265,22 @@ export default function ExamTake() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="sticky bottom-0 bg-card border-t border-border px-4 py-3 space-y-3">
+      <div className="sticky bottom-0 bg-card border-t-2 border-border px-4 pt-3 pb-5 space-y-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
         {/* Question palette toggle */}
         <button
           onClick={() => setShowPalette(!showPalette)}
-          className="w-full text-center text-xs text-muted-foreground font-medium py-1 hover:text-primary transition-colors"
+          className="w-full text-center text-xs text-muted-foreground font-semibold py-1.5 hover:text-primary transition-colors flex items-center justify-center gap-1"
         >
-          {showPalette ? "▲ Hide" : "▼ Question Palette"}
+          <span>{showPalette ? "▲ Hide Palette" : "▼ Question Palette"}</span>
         </button>
 
         {showPalette && (
-          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto py-1">
+          <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto py-1">
             {questions.map((qq, i) => (
               <button
                 key={i}
                 onClick={() => { setCurrentQ(i); setShowPalette(false); }}
-                className={`w-8 h-8 rounded-lg text-[11px] font-bold shrink-0 transition-all ${
+                className={`w-9 h-9 rounded-xl text-xs font-bold shrink-0 transition-all ${
                   i === currentQ
                     ? "gradient-primary text-white scale-110 shadow-primary"
                     : answers[qq.id] !== undefined
@@ -294,37 +294,42 @@ export default function ExamTake() {
           </div>
         )}
 
-        {/* Prev / Next / Submit */}
+        {/* Prev / Next / Submit — BIG BUTTONS */}
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
+          <button
             onClick={() => setCurrentQ((c) => Math.max(0, c - 1))}
             disabled={currentQ === 0}
-            className="rounded-xl h-12 px-5 font-semibold border-2"
+            className={`flex items-center justify-center gap-2 h-14 px-6 rounded-2xl border-2 font-bold text-base transition-all active:scale-95 ${
+              currentQ === 0
+                ? "border-muted text-muted-foreground bg-muted/30 opacity-40 cursor-not-allowed"
+                : "border-primary text-primary bg-primary/5 hover:bg-primary/10"
+            }`}
           >
-            <ChevronLeft className="h-4 w-4" /> Prev
-          </Button>
+            <ChevronLeft className="h-5 w-5" />
+            <span>Prev</span>
+          </button>
 
           <div className="flex-1" />
 
           {currentQ < questions.length - 1 ? (
-            <Button
+            <button
               onClick={() => setCurrentQ((c) => c + 1)}
-              className="rounded-xl h-12 px-6 font-bold gradient-primary border-0 shadow-primary"
+              className="flex items-center justify-center gap-2 h-14 px-8 rounded-2xl font-bold text-base text-white gradient-primary shadow-primary active:scale-95 transition-all"
             >
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
+              <span>Next</span>
+              <ChevronRight className="h-5 w-5" />
+            </button>
           ) : (
-            <Button
+            <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="rounded-xl h-12 px-6 font-bold bg-accent hover:bg-accent/90 text-white border-0 shadow-lg gap-2"
+              className="flex items-center justify-center gap-2 h-14 px-8 rounded-2xl font-bold text-base text-white bg-accent hover:bg-accent/90 shadow-lg active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {submitting
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>
-                : <><Flag className="h-4 w-4" /> Submit Exam</>
+                ? <><Loader2 className="h-5 w-5 animate-spin" /> Submitting...</>
+                : <><Flag className="h-5 w-5" /> Submit Exam</>
               }
-            </Button>
+            </button>
           )}
         </div>
       </div>
