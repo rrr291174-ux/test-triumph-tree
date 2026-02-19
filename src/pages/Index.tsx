@@ -88,13 +88,84 @@ const Index = () => {
 
       {/* Step 1: State Selection */}
       <div className="px-4 mb-5">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-4">
           <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
             <span className="text-white text-[10px] font-bold">1</span>
           </div>
-          <h2 className="font-heading font-bold text-sm text-foreground">Select Your State</h2>
+          <h2 className="font-heading font-bold text-base text-foreground">Select Your State</h2>
         </div>
-        <StateSelector selected={selectedState} onSelect={handleStateSelect} />
+        <div className="flex flex-col gap-4">
+          {[
+            {
+              id: "ap",
+              name: "Andhra Pradesh",
+              short: "AP",
+              capital: "Amaravati",
+              flag: "🏛️",
+              bg: "from-yellow-400 to-orange-500",
+              lightBg: "bg-orange-50 border-orange-200",
+              seal: "⚜️",
+              desc: "AP DSC • APPSC • TET",
+            },
+            {
+              id: "ts",
+              name: "Telangana",
+              short: "TS",
+              capital: "Hyderabad",
+              flag: "🏰",
+              bg: "from-pink-500 to-rose-600",
+              lightBg: "bg-rose-50 border-rose-200",
+              seal: "🌺",
+              desc: "TS DSC • TSPSC • TET",
+            },
+          ].map((state) => {
+            const isSelected = selectedState === state.id;
+            return (
+              <button
+                key={state.id}
+                onClick={() => handleStateSelect(state.id)}
+                className={`w-full relative overflow-hidden rounded-3xl border-2 transition-all duration-300 text-left ${
+                  isSelected ? "border-transparent scale-[1.01] shadow-xl" : "border-border bg-card shadow-card"
+                }`}
+              >
+                {isSelected && (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${state.bg}`} />
+                )}
+                {!isSelected && (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${state.bg} opacity-10`} />
+                )}
+                <div className="relative z-10 p-5 flex items-center gap-5">
+                  {/* Big State Emblem */}
+                  <div className={`w-20 h-20 rounded-2xl flex flex-col items-center justify-center shadow-lg ${isSelected ? "bg-white/20" : "bg-white/60 border border-border"}`}>
+                    <span className="text-4xl">{state.flag}</span>
+                    <span className="text-[10px] font-extrabold mt-1 text-foreground/70">{state.short}</span>
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1">
+                    <div className={`font-heading font-extrabold text-2xl leading-tight ${isSelected ? "text-white" : "text-foreground"}`}>
+                      {state.short}
+                    </div>
+                    <div className={`font-semibold text-sm ${isSelected ? "text-white/90" : "text-foreground/80"}`}>
+                      {state.name}
+                    </div>
+                    <div className={`text-xs mt-1 ${isSelected ? "text-white/70" : "text-muted-foreground"}`}>
+                      🏙️ {state.capital}
+                    </div>
+                    <div className={`text-[11px] mt-2 font-bold ${isSelected ? "text-white/80" : "text-primary"}`}>
+                      {state.desc}
+                    </div>
+                  </div>
+                  {/* Check / Arrow */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? "bg-white/30" : "bg-primary/10"}`}>
+                    {isSelected
+                      ? <span className="text-white font-bold text-sm">✓</span>
+                      : <ChevronRight className="h-4 w-4 text-primary" />}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Step 2: Exam Type */}
