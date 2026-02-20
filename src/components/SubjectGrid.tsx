@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTheme } from "next-themes";
 import {
   Brain, BookOpen, Globe, Calculator, Leaf, FlaskConical,
   Users, BookMarked, Lightbulb, Languages, Compass
@@ -33,9 +34,12 @@ interface SubjectGridProps {
 }
 
 export function SubjectGrid({ examType }: SubjectGridProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
     <div className="px-4 pb-4">
-      <h2 className="font-heading font-bold text-lg mb-3 text-white">📚 Subjects</h2>
+      <h2 className="font-heading font-bold text-lg mb-3" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>📚 Subjects</h2>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
         {subjects.map((subject, i) => (
           <Link
@@ -47,18 +51,18 @@ export function SubjectGrid({ examType }: SubjectGridProps) {
             <div
               className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-300 hover:-translate-y-1 border"
               style={{
-                background: "rgba(255,255,255,0.06)",
-                borderColor: "rgba(245,158,11,0.2)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.85)",
+                borderColor: isDark ? "rgba(245,158,11,0.2)" : "rgba(30,58,138,0.12)",
+                boxShadow: isDark ? "0 4px 15px rgba(0,0,0,0.3)" : "0 4px 15px rgba(0,0,0,0.06)",
               }}
             >
               <div className={`w-12 h-12 rounded-xl ${subject.bgClass} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <subject.icon className={`h-6 w-6 ${subject.colorClass}`} />
               </div>
-              <span className="text-xs font-semibold text-center leading-tight text-white">
+              <span className="text-xs font-semibold text-center leading-tight" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>
                 {subject.name}
               </span>
-              <span className="text-[10px] text-white/50">
+              <span className="text-[10px]" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}>
                 {subject.tests} tests
               </span>
             </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { SubjectGrid } from "@/components/SubjectGrid";
 import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
 import apStateCard from "@/assets/ap-state-card.png";
@@ -114,6 +115,8 @@ const Index = () => {
   const [selectedExamType, setSelectedExamType] = useState<string | null>(null);
   const examSectionRef = useRef<HTMLDivElement>(null);
   const subjectSectionRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   const handleStateSelect = (stateId: string) => {
     setSelectedState(stateId);
@@ -132,9 +135,11 @@ const Index = () => {
 
   return (
     <div
-      className="min-h-screen pb-24"
+      className="min-h-screen pb-24 transition-colors duration-300"
       style={{
-        background: "radial-gradient(ellipse at 50% 0%, #0d1f4a 0%, #060c1a 45%, #040810 100%)",
+        background: isDark
+          ? "radial-gradient(ellipse at 50% 0%, #0d1f4a 0%, #060c1a 45%, #040810 100%)"
+          : "radial-gradient(ellipse at 50% 0%, #dbeafe 0%, #f0f4ff 45%, #f8faff 100%)",
       }}
     >
       {/* Hero Section */}
@@ -161,8 +166,8 @@ const Index = () => {
             className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-20 blur-2xl opacity-15"
             style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)" }}
           />
-          {/* Twinkling stars */}
-          {[...Array(24)].map((_, i) => (
+          {/* Twinkling stars — dark mode only */}
+          {isDark && [...Array(24)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute rounded-full bg-white"
@@ -272,7 +277,7 @@ const Index = () => {
           >
             <p
               className="text-sm font-semibold leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.72)" }}
+              style={{ color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.6)" }}
             >
               Complete preparation with
             </p>
@@ -357,7 +362,7 @@ const Index = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
-          <span className="text-white font-bold text-sm tracking-widest uppercase">Select Your State</span>
+          <span className="font-bold text-sm tracking-widest uppercase" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>Select Your State</span>
           <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
         </motion.div>
 
@@ -523,7 +528,7 @@ const Index = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
-                <span className="text-white font-bold text-sm tracking-widest uppercase">Select Exam Type</span>
+                <span className="font-bold text-sm tracking-widest uppercase" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>Select Exam Type</span>
                 <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
               </div>
               <motion.div
@@ -609,7 +614,7 @@ const Index = () => {
               <div className="px-4 mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">
                   <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
-                  <span className="text-white font-bold text-sm tracking-widest uppercase">Choose Subject</span>
+                  <span className="font-bold text-sm tracking-widest uppercase" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>Choose Subject</span>
                   <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
                 </div>
                 <div className="flex items-center gap-1 ml-2" style={{ color: "#f59e0b" }}>
