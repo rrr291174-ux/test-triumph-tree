@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { StateSelector } from "@/components/StateSelector";
 import { SubjectGrid } from "@/components/SubjectGrid";
-import { ChevronRight, GraduationCap, BookOpen, Trophy, Video, Star } from "lucide-react";
+import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen } from "lucide-react";
+import apStateCard from "@/assets/ap-state-card.png";
+import tsStateCard from "@/assets/ts-state-card.png";
 
 const examTypes = [
   {
@@ -10,8 +11,6 @@ const examTypes = [
     fullName: "School Assistant",
     emoji: "🎓",
     gradient: "from-blue-500 to-indigo-600",
-    lightBg: "bg-blue-50 border-blue-200",
-    activeBg: "bg-gradient-to-br from-blue-500 to-indigo-600",
   },
   {
     id: "sgt",
@@ -19,15 +18,30 @@ const examTypes = [
     fullName: "Secondary Grade Teacher",
     emoji: "📖",
     gradient: "from-emerald-500 to-teal-600",
-    lightBg: "bg-emerald-50 border-emerald-200",
-    activeBg: "bg-gradient-to-br from-emerald-500 to-teal-600",
   },
 ];
 
-const stats = [
-  { value: "50+", label: "Test Series", icon: Trophy, color: "text-orange-500", bg: "bg-orange-50" },
-  { value: "200+", label: "Notes", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-50" },
-  { value: "100+", label: "Classes", icon: Video, color: "text-emerald-500", bg: "bg-emerald-50" },
+const states = [
+  {
+    id: "ap",
+    name: "ANDHRA PRADESH",
+    short: "AP",
+    capital: "Amaravati",
+    desc: "AP DSC • APPSC • TET",
+    image: apStateCard,
+    accentColor: "#f97316",
+    stripColors: "from-orange-500 via-white to-green-600",
+  },
+  {
+    id: "ts",
+    name: "TELANGANA",
+    short: "TG",
+    capital: "Hyderabad",
+    desc: "TG DSC • TSPSC • TET",
+    image: tsStateCard,
+    accentColor: "#f97316",
+    stripColors: "from-pink-500 via-white to-green-600",
+  },
 ];
 
 const Index = () => {
@@ -40,126 +54,180 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen pb-24" style={{ background: "linear-gradient(180deg, #0a0a1a 0%, #0d1128 40%, #0a1020 100%)" }}>
 
       {/* Hero Section */}
-      <div className="gradient-hero px-4 pt-6 pb-10 relative overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/10" />
-        <div className="absolute top-10 -right-4 w-20 h-20 rounded-full bg-white/10" />
-        <div className="absolute -bottom-6 -left-6 w-28 h-28 rounded-full bg-white/10" />
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <Star className="h-4 w-4 text-yellow-300 fill-yellow-300" />
-            <span className="text-white/80 text-xs font-semibold">AP & TS Competitive Exams</span>
-          </div>
-          <h1 className="font-heading font-extrabold text-3xl text-white leading-tight">
-            Best Study<br />Platform 🎯
-          </h1>
-          <p className="text-white/75 text-xs mt-2 leading-relaxed max-w-[220px]">
-            Complete preparation with Test Series, Notes & Live Classes
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <div className="bg-white/20 rounded-full px-3 py-1">
-              <span className="text-[10px] text-white font-bold">SA • SGT • DSC</span>
-            </div>
-            <div className="bg-yellow-400/30 rounded-full px-3 py-1">
-              <span className="text-[10px] text-yellow-200 font-bold">🏆 Trusted by 1000+</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Row */}
-      <div className="px-4 -mt-5 mb-5">
-        <div className="grid grid-cols-3 gap-2">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-card rounded-2xl p-3 shadow-card border border-border/50 text-center">
-              <div className={`w-8 h-8 ${stat.bg} rounded-xl flex items-center justify-center mx-auto mb-1`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-              <div className={`font-heading font-extrabold text-lg ${stat.color} leading-none`}>{stat.value}</div>
-              <div className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</div>
-            </div>
+      <div className="relative px-4 pt-6 pb-6 overflow-hidden">
+        {/* Star particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-white"
+              style={{
+                width: Math.random() * 2 + 1 + "px",
+                height: Math.random() * 2 + 1 + "px",
+                top: Math.random() * 100 + "%",
+                left: Math.random() * 100 + "%",
+                opacity: Math.random() * 0.7 + 0.3,
+              }}
+            />
           ))}
         </div>
+
+        {/* Golden glow orb */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full opacity-20 blur-3xl"
+          style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)" }} />
+
+        <div className="relative z-10 text-center">
+          {/* AP & TG Banner */}
+          <div className="inline-block mb-3">
+            <div className="relative">
+              {/* Laurel wreaths */}
+              <span className="absolute -left-6 top-1/2 -translate-y-1/2 text-2xl">🏆</span>
+              <span className="absolute -right-6 top-1/2 -translate-y-1/2 text-2xl">🏆</span>
+              <div
+                className="px-8 py-2 rounded-lg"
+                style={{
+                  background: "linear-gradient(135deg, #b45309, #f59e0b, #d97706)",
+                  boxShadow: "0 0 20px rgba(245, 158, 11, 0.5)",
+                }}
+              >
+                <div className="font-heading font-extrabold text-2xl leading-tight"
+                  style={{ color: "#fff", textShadow: "0 0 10px rgba(245,158,11,0.8)" }}>
+                  AP & TG
+                </div>
+                <div className="text-xs font-bold italic" style={{ color: "#fef3c7" }}>
+                  Competitive Exams
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Best Study Platform */}
+          <div className="mb-2">
+            <h1 className="font-heading font-extrabold text-3xl leading-tight text-white">
+              Best{" "}
+              <span style={{ color: "#f59e0b", textShadow: "0 0 15px rgba(245,158,11,0.6)" }}>
+                Study
+              </span>{" "}
+              Platform 🎯
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="text-yellow-400 text-xs">✦</span>
+            <p className="text-white/70 text-xs">Complete Preparation with</p>
+            <span className="text-yellow-400 text-xs">✦</span>
+          </div>
+          <p className="text-white/60 text-xs mb-5">
+            📚 Test Series, Notes & Live Classes 🚀
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-3 justify-center">
+            <button
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm text-white transition-transform active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #ea580c, #f97316)",
+                boxShadow: "0 4px 15px rgba(249,115,22,0.5)",
+              }}
+            >
+              <Rocket className="h-4 w-4" />
+              Start Practice
+            </button>
+            <button
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm text-white transition-transform active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
+                boxShadow: "0 4px 15px rgba(59,130,246,0.5)",
+              }}
+            >
+              <BookOpen className="h-4 w-4" />
+              Courses
+              <ChevronRight className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Step 1: State Selection */}
-      <div className="px-4 mb-5">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
-            <span className="text-white text-[10px] font-bold">1</span>
-          </div>
-          <h2 className="font-heading font-bold text-base text-foreground">Select Your State</h2>
+      {/* Select Your State */}
+      <div className="px-4 mb-4">
+        {/* Section header */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
+          <span className="text-white font-bold text-sm tracking-widest uppercase">Select Your State</span>
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
         </div>
+
+        {/* State Cards */}
         <div className="flex flex-col gap-4">
-          {[
-            {
-              id: "ap",
-              name: "Andhra Pradesh",
-              short: "AP",
-              capital: "Amaravati",
-              flag: "🏛️",
-              bg: "from-yellow-400 to-orange-500",
-              lightBg: "bg-orange-50 border-orange-200",
-              seal: "⚜️",
-              desc: "AP DSC • APPSC • TET",
-            },
-            {
-              id: "ts",
-              name: "Telangana",
-              short: "TS",
-              capital: "Hyderabad",
-              flag: "🏰",
-              bg: "from-pink-500 to-rose-600",
-              lightBg: "bg-rose-50 border-rose-200",
-              seal: "🌺",
-              desc: "TS DSC • TSPSC • TET",
-            },
-          ].map((state) => {
+          {states.map((state) => {
             const isSelected = selectedState === state.id;
             return (
               <button
                 key={state.id}
                 onClick={() => handleStateSelect(state.id)}
-                className={`w-full relative overflow-hidden rounded-3xl border-2 transition-all duration-300 text-left ${
-                  isSelected ? "border-transparent scale-[1.01] shadow-xl" : "border-border bg-card shadow-card"
-                }`}
+                className="w-full text-left relative overflow-hidden transition-all duration-300 active:scale-[0.98]"
+                style={{
+                  borderRadius: "20px",
+                  boxShadow: isSelected
+                    ? `0 0 25px rgba(249,115,22,0.6), 0 0 50px rgba(249,115,22,0.2), inset 0 0 0 2px ${state.accentColor}`
+                    : "0 0 15px rgba(245,158,11,0.15), inset 0 0 0 1.5px rgba(245,158,11,0.3)",
+                }}
               >
+                {/* Card background */}
+                <div className="absolute inset-0 rounded-[20px]" style={{ background: "linear-gradient(135deg, #f8f4e8 0%, #ffffff 50%, #f0f4f8 100%)" }} />
+
+                {/* Indian flag color strip at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-1.5 rounded-b-[20px] overflow-hidden">
+                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors}`} />
+                </div>
+
+                {/* Golden top glow when selected */}
                 {isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${state.bg}`} />
+                  <div className="absolute top-0 left-0 right-0 h-1 rounded-t-[20px]"
+                    style={{ background: "linear-gradient(90deg, transparent, #f59e0b, transparent)" }} />
                 )}
-                {!isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${state.bg} opacity-10`} />
-                )}
-                <div className="relative z-10 p-5 flex items-center gap-5">
-                  {/* Big State Emblem */}
-                  <div className={`w-20 h-20 rounded-2xl flex flex-col items-center justify-center shadow-lg ${isSelected ? "bg-white/20" : "bg-white/60 border border-border"}`}>
-                    <span className="text-4xl">{state.flag}</span>
-                    <span className="text-[10px] font-extrabold mt-1 text-foreground/70">{state.short}</span>
-                  </div>
-                  {/* Info */}
+
+                <div className="relative z-10 p-4 flex items-center gap-3">
+                  {/* Text Info */}
                   <div className="flex-1">
-                    <div className={`font-heading font-extrabold text-2xl leading-tight ${isSelected ? "text-white" : "text-foreground"}`}>
-                      {state.short}
-                    </div>
-                    <div className={`font-semibold text-sm ${isSelected ? "text-white/90" : "text-foreground/80"}`}>
+                    <div className="font-heading font-extrabold text-2xl leading-none text-gray-900 tracking-tight mb-1">
                       {state.name}
                     </div>
-                    <div className={`text-xs mt-1 ${isSelected ? "text-white/70" : "text-muted-foreground"}`}>
-                      🏙️ {state.capital}
+                    <div className="flex items-center gap-1 mb-2">
+                      <MapPin className="h-3 w-3 text-blue-500" />
+                      <span className="text-blue-600 text-xs font-semibold">{state.capital}</span>
                     </div>
-                    <div className={`text-[11px] mt-2 font-bold ${isSelected ? "text-white/80" : "text-primary"}`}>
+                    <div
+                      className="inline-block px-3 py-1 rounded-full text-[11px] font-bold text-white"
+                      style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
+                    >
                       {state.desc}
                     </div>
                   </div>
-                  {/* Check / Arrow */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isSelected ? "bg-white/30" : "bg-primary/10"}`}>
-                    {isSelected
-                      ? <span className="text-white font-bold text-sm">✓</span>
-                      : <ChevronRight className="h-4 w-4 text-primary" />}
+
+                  {/* State Image */}
+                  <div className="relative w-32 h-20 flex-shrink-0">
+                    <img
+                      src={state.image}
+                      alt={state.name}
+                      className="w-full h-full object-cover rounded-xl"
+                      style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+                    />
+                  </div>
+
+                  {/* Arrow button */}
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "linear-gradient(135deg, #ea580c, #f97316)",
+                      boxShadow: "0 4px 10px rgba(249,115,22,0.5)",
+                    }}
+                  >
+                    <ChevronRight className="h-5 w-5 text-white" />
                   </div>
                 </div>
               </button>
@@ -168,14 +236,22 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Telugu prompt when nothing selected */}
+      {!selectedState && (
+        <div className="px-4 mt-2 text-center animate-fade-in">
+          <p className="text-base font-bold" style={{ color: "#f59e0b" }}>
+            👆 AP లేదా Telangana ని Select చేయండి.
+          </p>
+        </div>
+      )}
+
       {/* Step 2: Exam Type */}
       {selectedState && (
         <div className="px-4 mb-5 animate-slide-up">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
-              <span className="text-white text-[10px] font-bold">2</span>
-            </div>
-            <h2 className="font-heading font-bold text-sm text-foreground">Select Exam Type</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
+            <span className="text-white font-bold text-sm tracking-widest uppercase">Select Exam Type</span>
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
           </div>
           <div className="flex gap-3">
             {examTypes.map((et) => {
@@ -187,8 +263,13 @@ const Index = () => {
                   className={`flex-1 relative overflow-hidden rounded-2xl border-2 transition-all duration-300 ${
                     isActive
                       ? "border-transparent shadow-lg scale-[1.03]"
-                      : "border-border bg-card shadow-card hover:scale-[1.02]"
+                      : "border-white/10 shadow-card hover:scale-[1.02]"
                   }`}
+                  style={{
+                    background: isActive
+                      ? undefined
+                      : "rgba(255,255,255,0.05)",
+                  }}
                 >
                   {isActive && (
                     <div className={`absolute inset-0 bg-gradient-to-br ${et.gradient}`} />
@@ -196,10 +277,10 @@ const Index = () => {
                   <div className="relative z-10 p-4 flex flex-col items-center gap-2">
                     <span className="text-3xl">{et.emoji}</span>
                     <div>
-                      <div className={`font-heading font-extrabold text-xl ${isActive ? "text-white" : "text-foreground"}`}>
+                      <div className={`font-heading font-extrabold text-xl ${isActive ? "text-white" : "text-white"}`}>
                         {et.label}
                       </div>
-                      <div className={`text-[10px] ${isActive ? "text-white/80" : "text-muted-foreground"} text-center leading-tight`}>
+                      <div className={`text-[10px] ${isActive ? "text-white/80" : "text-white/50"} text-center leading-tight`}>
                         {et.fullName}
                       </div>
                     </div>
@@ -221,29 +302,16 @@ const Index = () => {
       {selectedState && selectedExamType && (
         <div className="animate-slide-up">
           <div className="px-4 mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full gradient-hero flex items-center justify-center">
-                <span className="text-white text-[10px] font-bold">3</span>
-              </div>
-              <h2 className="font-heading font-bold text-sm text-foreground">Choose Subject</h2>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
+              <span className="text-white font-bold text-sm tracking-widest uppercase">Choose Subject</span>
             </div>
-            <div className="flex items-center gap-1 text-primary">
+            <div className="flex items-center gap-1" style={{ color: "#f59e0b" }}>
               <GraduationCap className="h-3 w-3" />
               <span className="text-[10px] font-bold uppercase">{selectedExamType}</span>
             </div>
           </div>
           <SubjectGrid examType={selectedExamType} />
-        </div>
-      )}
-
-      {/* Empty state when nothing selected */}
-      {!selectedState && (
-        <div className="px-4 mt-4">
-          <div className="bg-card rounded-2xl p-6 border border-dashed border-border text-center">
-            <div className="text-4xl mb-2">👆</div>
-            <p className="text-sm text-muted-foreground font-medium">మీ state select చేయండి</p>
-            <p className="text-xs text-muted-foreground mt-1">AP లేదా Telangana ని choose చేయండి</p>
-          </div>
         </div>
       )}
     </div>
