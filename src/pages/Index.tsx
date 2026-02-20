@@ -233,43 +233,59 @@ const Index = () => {
 
           {/* Best Study Platform headline */}
           <motion.div
-            className="mb-2"
+            className="mb-3"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.22, ease: easeOut }}
           >
-            <h1 className="font-heading font-extrabold text-[2rem] leading-tight text-white tracking-tight">
+            <h1 className="font-heading font-black text-[2.6rem] leading-[1.1] text-white tracking-tight drop-shadow-lg">
               Best{" "}
               <span
                 style={{
-                  background: "linear-gradient(90deg, #f59e0b, #fbbf24)",
+                  background: "linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  filter: "drop-shadow(0 0 12px rgba(245,158,11,0.7))",
+                  filter: "drop-shadow(0 0 18px rgba(245,158,11,0.85))",
                 }}
               >
                 Study
-              </span>{" "}
-              Platform 🎯
+              </span>
+              <br />
+              <span
+                style={{
+                  background: "linear-gradient(90deg, #ffffff, #e0e7ff)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Platform
+              </span>{" "}🎯
             </h1>
           </motion.div>
 
           {/* Subtitle */}
           <motion.div
+            className="mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.32 }}
           >
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <span style={{ color: "#f59e0b" }} className="text-xs">✦</span>
-              <p className="text-white/65 text-xs font-medium">Complete Preparation with</p>
-              <span style={{ color: "#f59e0b" }} className="text-xs">✦</span>
-            </div>
-            <div className="flex items-center justify-center gap-1.5 mb-5">
-              <span className="text-sm">📚</span>
-              <p className="text-white/50 text-xs">Test Series, Notes & Live Classes</p>
-              <span className="text-sm">🚀</span>
-            </div>
+            <p
+              className="text-sm font-semibold leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.72)" }}
+            >
+              Complete preparation with
+            </p>
+            <p
+              className="text-sm font-bold"
+              style={{
+                background: "linear-gradient(90deg, #fbbf24, #38bdf8, #a78bfa)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Test Series, Notes &amp; Live Classes
+            </p>
           </motion.div>
 
           {/* CTA Buttons */}
@@ -279,38 +295,51 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.42, ease: easeOut }}
           >
+            {/* Orange glossy button */}
             <motion.button
-              className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"
+              className="relative flex items-center gap-2 px-7 py-3.5 rounded-2xl font-extrabold text-sm text-white overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, #c2410c, #ea580c, #f97316)",
-                boxShadow: "0 4px 20px rgba(234,88,12,0.55), 0 0 40px rgba(234,88,12,0.2)",
-                border: "1px solid rgba(249,115,22,0.4)",
+                background: "linear-gradient(135deg, #ff6a00, #ee0979, #f97316)",
+                boxShadow: "0 6px 28px rgba(249,115,22,0.6), 0 0 50px rgba(249,115,22,0.25), inset 0 1px 0 rgba(255,255,255,0.25)",
+                border: "1px solid rgba(255,160,80,0.5)",
               }}
-              whileTap={{ scale: 0.94 }}
+              whileTap={{ scale: 0.93 }}
               whileHover={{
                 scale: 1.06,
-                boxShadow: "0 6px 28px rgba(234,88,12,0.75), 0 0 50px rgba(234,88,12,0.3)",
+                boxShadow: "0 8px 36px rgba(249,115,22,0.8), 0 0 60px rgba(249,115,22,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
               }}
             >
-              <Rocket className="h-4 w-4" />
-              Start Practice
+              {/* Gloss overlay */}
+              <div
+                className="absolute inset-x-0 top-0 h-1/2 rounded-t-2xl pointer-events-none"
+                style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%)" }}
+              />
+              <Rocket className="h-4 w-4 relative z-10" />
+              <span className="relative z-10">Start Practice</span>
             </motion.button>
+
+            {/* Blue glossy button */}
             <motion.button
-              className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"
+              className="relative flex items-center gap-2 px-7 py-3.5 rounded-2xl font-extrabold text-sm text-white overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6)",
-                boxShadow: "0 4px 20px rgba(29,78,216,0.55), 0 0 40px rgba(29,78,216,0.2)",
-                border: "1px solid rgba(59,130,246,0.4)",
+                background: "linear-gradient(135deg, #1e3a8a, #2563eb, #38bdf8)",
+                boxShadow: "0 6px 28px rgba(37,99,235,0.6), 0 0 50px rgba(37,99,235,0.25), inset 0 1px 0 rgba(255,255,255,0.25)",
+                border: "1px solid rgba(96,165,250,0.5)",
               }}
-              whileTap={{ scale: 0.94 }}
+              whileTap={{ scale: 0.93 }}
               whileHover={{
                 scale: 1.06,
-                boxShadow: "0 6px 28px rgba(29,78,216,0.75), 0 0 50px rgba(29,78,216,0.3)",
+                boxShadow: "0 8px 36px rgba(37,99,235,0.8), 0 0 60px rgba(37,99,235,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
               }}
             >
-              <BookOpen className="h-4 w-4" />
-              Courses
-              <ChevronRight className="h-3 w-3" />
+              {/* Gloss overlay */}
+              <div
+                className="absolute inset-x-0 top-0 h-1/2 rounded-t-2xl pointer-events-none"
+                style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%)" }}
+              />
+              <BookOpen className="h-4 w-4 relative z-10" />
+              <span className="relative z-10">Courses</span>
+              <ChevronRight className="h-3.5 w-3.5 relative z-10" />
             </motion.button>
           </motion.div>
         </div>
