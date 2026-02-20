@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { SubjectGrid } from "@/components/SubjectGrid";
 import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
-import apStateCard from "@/assets/ap-state-card.png";
-import tsStateCard from "@/assets/ts-state-card.png";
+import apStateCard from "@/assets/ap-map-3d.png";
+import tsStateCard from "@/assets/ts-map-3d.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -363,7 +363,7 @@ const Index = () => {
 
         {/* State Cards */}
         <motion.div
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
@@ -375,76 +375,126 @@ const Index = () => {
                 key={state.id}
                 onClick={() => handleStateSelect(state.id)}
                 className="w-full text-left relative overflow-hidden"
-                style={{ borderRadius: "20px" }}
+                style={{ borderRadius: "24px" }}
                 variants={subjectItem}
-                animate={isSelected ? { scale: 1.02 } : { scale: 1 }}
+                animate={isSelected ? { scale: 1.025 } : { scale: 1 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                {/* Glow border via box-shadow */}
-                <motion.div
-                  className="absolute inset-0 rounded-[20px]"
-                  animate={{
-                    boxShadow: isSelected
-                      ? "0 0 25px rgba(249,115,22,0.6), 0 0 50px rgba(249,115,22,0.2), inset 0 0 0 2px #f97316"
-                      : "0 0 15px rgba(245,158,11,0.15), inset 0 0 0 1.5px rgba(245,158,11,0.3)",
+                {/* Dark glass card background */}
+                <div
+                  className="absolute inset-0 rounded-[24px]"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(15,25,60,0.96) 0%, rgba(8,14,40,0.98) 60%, rgba(5,10,30,1) 100%)",
+                    backdropFilter: "blur(20px)",
                   }}
-                  transition={{ duration: 0.3 }}
                 />
 
-                {/* Card background */}
-                <div className="absolute inset-0 rounded-[20px]" style={{ background: "linear-gradient(135deg, #f8f4e8 0%, #ffffff 50%, #f0f4f8 100%)" }} />
+                {/* Glow border */}
+                <motion.div
+                  className="absolute inset-0 rounded-[24px]"
+                  animate={{
+                    boxShadow: isSelected
+                      ? "0 0 30px rgba(249,115,22,0.55), 0 0 60px rgba(249,115,22,0.2), inset 0 0 0 2px rgba(249,115,22,0.8)"
+                      : "0 4px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(245,158,11,0.25)",
+                  }}
+                  transition={{ duration: 0.35 }}
+                />
 
-                {/* Indian flag color strip at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-1.5 rounded-b-[20px] overflow-hidden">
-                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors}`} />
-                </div>
+                {/* Top golden gloss line */}
+                <div
+                  className="absolute top-0 left-6 right-6 h-px rounded-full"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,200,80,0.4), transparent)" }}
+                />
 
-                {/* Golden top glow when selected */}
+                {/* Selected golden top bar */}
                 <AnimatePresence>
                   {isSelected && (
                     <motion.div
-                      className="absolute top-0 left-0 right-0 h-1 rounded-t-[20px]"
-                      style={{ background: "linear-gradient(90deg, transparent, #f59e0b, transparent)" }}
+                      className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[24px]"
+                      style={{ background: "linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent)" }}
                       initial={{ scaleX: 0, opacity: 0 }}
                       animate={{ scaleX: 1, opacity: 1 }}
                       exit={{ scaleX: 0, opacity: 0 }}
-                      transition={{ duration: 0.4 }}
+                      transition={{ duration: 0.45 }}
                     />
                   )}
                 </AnimatePresence>
 
-                <div className="relative z-10 p-4 flex items-center gap-3">
-                  <div className="flex-1">
-                    <div className="font-heading font-extrabold text-2xl leading-none text-gray-900 tracking-tight mb-1">
+                {/* Indian tricolor ribbon at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-2 rounded-b-[24px] overflow-hidden">
+                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors} opacity-80`} />
+                </div>
+
+                <div className="relative z-10 p-5 flex items-center gap-4">
+                  {/* Text content */}
+                  <div className="flex-1 min-w-0">
+                    {/* State name - same size bold */}
+                    <div
+                      className="font-heading font-extrabold text-[1.35rem] leading-tight tracking-tight mb-1.5"
+                      style={{
+                        background: "linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
                       {state.name}
                     </div>
-                    <div className="flex items-center gap-1 mb-2">
-                      <MapPin className="h-3 w-3 text-blue-500" />
-                      <span className="text-blue-600 text-xs font-semibold">{state.capital}</span>
+
+                    {/* Capital subtitle */}
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <div
+                        className="flex items-center justify-center w-4 h-4 rounded-full"
+                        style={{ background: "rgba(249,115,22,0.2)", border: "1px solid rgba(249,115,22,0.4)" }}
+                      >
+                        <MapPin className="h-2.5 w-2.5" style={{ color: "#f97316" }} />
+                      </div>
+                      <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
+                        Capital: {state.capital}
+                      </span>
                     </div>
+
+                    {/* Tags */}
                     <div
-                      className="inline-block px-3 py-1 rounded-full text-[11px] font-bold text-white"
-                      style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
+                      className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wide"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(234,88,12,0.3), rgba(249,115,22,0.2))",
+                        border: "1px solid rgba(249,115,22,0.4)",
+                        color: "#fdba74",
+                        boxShadow: "0 0 12px rgba(249,115,22,0.15)",
+                      }}
                     >
                       {state.desc}
                     </div>
                   </div>
 
-                  <div className="relative w-32 h-20 flex-shrink-0">
+                  {/* 3D Map image */}
+                  <div className="relative flex-shrink-0 w-28 h-28">
+                    {/* Map glow behind */}
+                    <div
+                      className="absolute inset-0 rounded-2xl blur-xl opacity-60"
+                      style={{ background: state.id === "ap" ? "radial-gradient(circle, #16a34a, transparent 70%)" : "radial-gradient(circle, #be185d, transparent 70%)" }}
+                    />
                     <img
                       src={state.image}
-                      alt={state.name}
-                      className="w-full h-full object-cover rounded-xl"
-                      style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))" }}
+                      alt={`${state.name} 3D map`}
+                      className="relative w-full h-full object-cover rounded-2xl"
+                      style={{
+                        filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.6)) saturate(1.2) brightness(1.05)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
                     />
                   </div>
 
+                  {/* Arrow indicator */}
                   <motion.div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                    className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
                     style={{
-                      background: "linear-gradient(135deg, #ea580c, #f97316)",
-                      boxShadow: "0 4px 10px rgba(249,115,22,0.5)",
+                      background: isSelected
+                        ? "linear-gradient(135deg, #ea580c, #f97316)"
+                        : "rgba(255,255,255,0.07)",
+                      border: isSelected ? "none" : "1px solid rgba(255,255,255,0.15)",
+                      boxShadow: isSelected ? "0 4px 14px rgba(249,115,22,0.6)" : "none",
                     }}
                     animate={isSelected ? { rotate: 90 } : { rotate: 0 }}
                     transition={{ type: "spring", stiffness: 250, damping: 18 }}
