@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { SubjectGrid } from "@/components/SubjectGrid";
-import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen } from "lucide-react";
+import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
 import apStateCard from "@/assets/ap-state-card.png";
 import tsStateCard from "@/assets/ts-state-card.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -68,6 +68,46 @@ const subjectItem: Variants = {
   hidden: { opacity: 0, y: 24, scale: 0.92 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35, ease: easeOut } },
 };
+
+const stats = [
+  { icon: Trophy, label: "Test Series", target: 50, suffix: "+", color: "#f59e0b", glow: "rgba(245,158,11,0.4)" },
+  { icon: FileText, label: "Notes", target: 200, suffix: "+", color: "#38bdf8", glow: "rgba(56,189,248,0.4)" },
+  { icon: Video, label: "Classes", target: 100, suffix: "+", color: "#a78bfa", glow: "rgba(167,139,250,0.4)" },
+];
+
+function AnimatedCounter({ target, suffix }: { target: number; suffix: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const duration = 1200;
+          const steps = 40;
+          const increment = target / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              setCount(target);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [target]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
 
 const Index = () => {
   const [selectedState, setSelectedState] = useState<string | null>(null);
@@ -216,6 +256,55 @@ const Index = () => {
               <ChevronRight className="h-3 w-3" />
             </motion.button>
           </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Stats Row */}
+      <motion.div
+        className="px-4 mb-5"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.55 }}
+      >
+        <div className="grid grid-cols-3 gap-3">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              className="relative overflow-hidden rounded-2xl flex flex-col items-center justify-center py-4 px-2"
+              style={{
+                background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+                border: `1px solid ${stat.color}33`,
+                boxShadow: `0 0 18px ${stat.glow}, inset 0 0 12px rgba(255,255,255,0.03)`,
+              }}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.6 + i * 0.1, ease: easeOut }}
+              whileHover={{ scale: 1.05 }}
+            >
+              {/* Icon with glow */}
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center mb-2"
+                style={{ background: `${stat.color}22`, boxShadow: `0 0 10px ${stat.glow}` }}
+              >
+                <stat.icon style={{ color: stat.color }} className="h-5 w-5" />
+              </div>
+              {/* Animated number */}
+              <div
+                className="font-heading font-extrabold text-2xl leading-none"
+                style={{ color: stat.color, textShadow: `0 0 12px ${stat.glow}` }}
+              >
+                <AnimatedCounter target={stat.target} suffix={stat.suffix} />
+              </div>
+              <div className="text-white/50 text-[10px] mt-1 font-semibold tracking-wide uppercase">
+                {stat.label}
+              </div>
+              {/* Corner shimmer */}
+              <div
+                className="absolute -top-4 -right-4 w-10 h-10 rounded-full blur-xl opacity-40"
+                style={{ background: stat.color }}
+              />
+            </motion.div>
+          ))}
         </div>
       </motion.div>
 
