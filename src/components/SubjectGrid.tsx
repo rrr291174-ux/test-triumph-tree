@@ -1,32 +1,38 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import {
-  Brain, BookOpen, Globe, Calculator, Leaf, FlaskConical,
-  Users, BookMarked, Lightbulb, Languages, Compass
-} from "lucide-react";
+
+import psychologyImg from "@/assets/subjects/psychology.jpg";
+import teluguImg from "@/assets/subjects/telugu.jpg";
+import englishImg from "@/assets/subjects/english.jpg";
+import mathematicsImg from "@/assets/subjects/mathematics.jpg";
+import evsImg from "@/assets/subjects/evs.jpg";
+import scienceImg from "@/assets/subjects/science.jpg";
+import socialImg from "@/assets/subjects/social.jpg";
+import teluguMethodImg from "@/assets/subjects/telugu-method.jpg";
+import englishMethodImg from "@/assets/subjects/english-method.jpg";
+import triMethodImg from "@/assets/subjects/tri-method.jpg";
+import perspectiveImg from "@/assets/subjects/perspective.jpg";
 
 export interface Subject {
   id: string;
   name: string;
-  icon: React.ElementType;
-  colorClass: string;
-  bgClass: string;
+  image: string;
   tests: number;
-  notes: number;
+  accentColor: string;
 }
 
 const subjects: Subject[] = [
-  { id: "psychology", name: "Psychology", icon: Brain, colorClass: "text-subject-psychology", bgClass: "bg-subject-psychology/15", tests: 12, notes: 8 },
-  { id: "telugu", name: "Telugu", icon: BookOpen, colorClass: "text-subject-telugu", bgClass: "bg-subject-telugu/15", tests: 15, notes: 10 },
-  { id: "english", name: "English", icon: Globe, colorClass: "text-subject-english", bgClass: "bg-subject-english/15", tests: 18, notes: 12 },
-  { id: "mathematics", name: "Mathematics", icon: Calculator, colorClass: "text-subject-math", bgClass: "bg-subject-math/15", tests: 20, notes: 14 },
-  { id: "evs", name: "EVS", icon: Leaf, colorClass: "text-subject-evs", bgClass: "bg-subject-evs/15", tests: 10, notes: 6 },
-  { id: "science", name: "Science", icon: FlaskConical, colorClass: "text-subject-science", bgClass: "bg-subject-science/15", tests: 16, notes: 11 },
-  { id: "social", name: "Social", icon: Users, colorClass: "text-subject-social", bgClass: "bg-subject-social/15", tests: 14, notes: 9 },
-  { id: "telugu-method", name: "Telugu Method", icon: BookMarked, colorClass: "text-subject-telugu", bgClass: "bg-subject-telugu/15", tests: 8, notes: 5 },
-  { id: "english-method", name: "English Method", icon: Languages, colorClass: "text-subject-english", bgClass: "bg-subject-english/15", tests: 8, notes: 5 },
-  { id: "tri-method", name: "Tri Method", icon: Compass, colorClass: "text-subject-method", bgClass: "bg-subject-method/15", tests: 6, notes: 4 },
-  { id: "perspective", name: "Perspective", icon: Lightbulb, colorClass: "text-subject-perspective", bgClass: "bg-subject-perspective/15", tests: 10, notes: 7 },
+  { id: "psychology",    name: "Psychology",     image: psychologyImg,    tests: 12, accentColor: "#818cf8" },
+  { id: "telugu",        name: "Telugu",          image: teluguImg,        tests: 15, accentColor: "#f59e0b" },
+  { id: "english",       name: "English",         image: englishImg,       tests: 18, accentColor: "#fb923c" },
+  { id: "mathematics",   name: "Mathematics",     image: mathematicsImg,   tests: 20, accentColor: "#f59e0b" },
+  { id: "evs",           name: "EVS",             image: evsImg,           tests: 10, accentColor: "#34d399" },
+  { id: "science",       name: "Science",         image: scienceImg,       tests: 16, accentColor: "#38bdf8" },
+  { id: "social",        name: "Social",          image: socialImg,        tests: 14, accentColor: "#60a5fa" },
+  { id: "telugu-method", name: "Telugu Method",   image: teluguMethodImg,  tests: 8,  accentColor: "#fbbf24" },
+  { id: "english-method",name: "English Method",  image: englishMethodImg, tests: 8,  accentColor: "#f97316" },
+  { id: "tri-method",    name: "Tri Method",      image: triMethodImg,     tests: 6,  accentColor: "#d97706" },
+  { id: "perspective",   name: "Perspective",     image: perspectiveImg,   tests: 10, accentColor: "#fb923c" },
 ];
 
 interface SubjectGridProps {
@@ -38,33 +44,74 @@ export function SubjectGrid({ examType }: SubjectGridProps) {
   const isDark = theme === "dark";
 
   return (
-    <div className="px-4 pb-4">
-      <h2 className="font-heading font-bold text-lg mb-3" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>📚 Subjects</h2>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+    <div className="px-3 pb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {subjects.map((subject, i) => (
           <Link
             key={subject.id}
             to={`/subject/${subject.id}`}
-            className="animate-slide-up group"
+            className="group"
             style={{ animationDelay: `${i * 50}ms` }}
           >
             <div
-              className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-300 hover:-translate-y-1 border"
+              className="relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02]"
               style={{
-                background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.85)",
-                borderColor: isDark ? "rgba(245,158,11,0.2)" : "rgba(30,58,138,0.12)",
-                boxShadow: isDark ? "0 4px 15px rgba(0,0,0,0.3)" : "0 4px 15px rgba(0,0,0,0.06)",
+                boxShadow: isDark
+                  ? `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06)`
+                  : `0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)`,
+                aspectRatio: "1 / 1",
               }}
             >
-              <div className={`w-12 h-12 rounded-xl ${subject.bgClass} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                <subject.icon className={`h-6 w-6 ${subject.colorClass}`} />
-              </div>
-              <span className="text-xs font-semibold text-center leading-tight" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>
-                {subject.name}
-              </span>
-              <span className="text-[10px]" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}>
+              {/* 3D HD Image */}
+              <img
+                src={subject.image}
+                alt={subject.name}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+
+              {/* Bottom gradient overlay for text */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: "linear-gradient(0deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.05) 100%)",
+                }}
+              />
+
+              {/* Accent glow border on hover */}
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  boxShadow: `inset 0 0 0 2px ${subject.accentColor}`,
+                }}
+              />
+
+              {/* Tests badge */}
+              <div
+                className="absolute top-2 right-2 text-white text-[9px] font-bold px-2 py-0.5 rounded-full"
+                style={{
+                  background: "rgba(0,0,0,0.55)",
+                  border: `1px solid ${subject.accentColor}60`,
+                  backdropFilter: "blur(6px)",
+                  color: subject.accentColor,
+                }}
+              >
                 {subject.tests} tests
-              </span>
+              </div>
+
+              {/* Subject name at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                <span
+                  className="font-heading font-bold text-xs leading-tight text-white drop-shadow-lg block"
+                  style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}
+                >
+                  {subject.name}
+                </span>
+                {/* Accent underline */}
+                <div
+                  className="h-[2px] mt-1 rounded-full w-0 group-hover:w-full transition-all duration-400"
+                  style={{ background: subject.accentColor }}
+                />
+              </div>
             </div>
           </Link>
         ))}
