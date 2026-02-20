@@ -596,10 +596,10 @@ const Index = () => {
         </AnimatePresence>
       </div>
 
-      {/* Step 3: Subjects */}
+      {/* Step 3: Subjects (SGT only) */}
       <div ref={subjectSectionRef}>
         <AnimatePresence>
-          {selectedState && selectedExamType && (
+          {selectedState && selectedExamType === "sgt" && (
             <motion.div
               variants={slideUp}
               initial="hidden"
@@ -614,10 +614,33 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-1 ml-2" style={{ color: "#f59e0b" }}>
                   <GraduationCap className="h-3 w-3" />
-                  <span className="text-[10px] font-bold uppercase">{selectedExamType}</span>
+                  <span className="text-[10px] font-bold uppercase">SGT</span>
                 </div>
               </div>
-              <SubjectGrid examType={selectedExamType} />
+              <SubjectGrid examType="sgt" />
+            </motion.div>
+          )}
+          {selectedState && selectedExamType === "sa" && (
+            <motion.div
+              variants={slideUp}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="px-4 py-8 text-center"
+            >
+              <div
+                className="rounded-2xl py-8 px-6"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(245,158,11,0.2)",
+                }}
+              >
+                <div className="text-4xl mb-3">🚀</div>
+                <div className="font-heading font-bold text-white text-lg mb-1">Coming Soon!</div>
+                <div className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  SA subjects త్వరలో వస్తాయి...
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
