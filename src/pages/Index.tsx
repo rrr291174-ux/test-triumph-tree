@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
 import apStateCard from "@/assets/ap-state-card.png";
 import tsStateCard from "@/assets/ts-state-card.png";
+import charminarImg from "@/assets/charminar-3d.png";
+import telanganaMapImg from "@/assets/telangana-map.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -485,9 +487,38 @@ const Index = () => {
                     </div>
                   </div>
 
+                  {/* Telangana: Charminar + Map overlay on right */}
+                  {state.id === "ts" && (
+                    <div className="flex-shrink-0 flex flex-col items-center ml-2 gap-1">
+                      {/* Charminar */}
+                      <div className="relative w-16 h-16">
+                        <img
+                          src={charminarImg}
+                          alt="Charminar"
+                          className="w-full h-full object-cover rounded-xl"
+                          style={{
+                            boxShadow: "0 0 18px rgba(249,115,22,0.7), 0 0 36px rgba(249,115,22,0.3)",
+                            border: "1.5px solid rgba(249,115,22,0.6)",
+                          }}
+                        />
+                      </div>
+                      {/* Telangana Map */}
+                      <div className="relative w-12 h-12">
+                        <img
+                          src={telanganaMapImg}
+                          alt="Telangana Map"
+                          className="w-full h-full object-contain"
+                          style={{
+                            filter: "drop-shadow(0 0 8px #ec4899) drop-shadow(0 0 16px #f97316)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Arrow button */}
                   <motion.div
-                    className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ml-3"
+                    className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ml-2"
                     style={{
                       background: "linear-gradient(135deg, #ea580c, #f97316)",
                       boxShadow: "0 4px 16px rgba(249,115,22,0.7)",
