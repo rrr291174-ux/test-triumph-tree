@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { SubjectGrid } from "@/components/SubjectGrid";
-import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ChevronRight, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
 import apStateCard from "@/assets/ap-state-card.png";
 import tsStateCard from "@/assets/ts-state-card.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -114,9 +114,9 @@ const Index = () => {
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [selectedExamType, setSelectedExamType] = useState<string | null>(null);
   const examSectionRef = useRef<HTMLDivElement>(null);
-  const subjectSectionRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const navigate = useNavigate();
 
   const handleStateSelect = (stateId: string) => {
     setSelectedState(stateId);
@@ -129,8 +129,8 @@ const Index = () => {
   const handleExamTypeSelect = (examId: string) => {
     setSelectedExamType(examId);
     setTimeout(() => {
-      subjectSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 200);
+      navigate(`/subjects/${examId}?state=${selectedState}`);
+    }, 300);
   };
 
   return (
@@ -608,55 +608,6 @@ const Index = () => {
         </AnimatePresence>
       </div>
 
-      {/* Step 3: Subjects (SGT only) */}
-      <div ref={subjectSectionRef}>
-        <AnimatePresence>
-          {selectedState && selectedExamType === "sgt" && (
-            <motion.div
-              variants={slideUp}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <div className="px-4 mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                  <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
-                  <span className="font-bold text-sm tracking-widest uppercase" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>Choose Subject</span>
-                  <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
-                </div>
-                <div className="flex items-center gap-1 ml-2" style={{ color: "#f59e0b" }}>
-                  <GraduationCap className="h-3 w-3" />
-                  <span className="text-[10px] font-bold uppercase">SGT</span>
-                </div>
-              </div>
-              <SubjectGrid examType="sgt" />
-            </motion.div>
-          )}
-          {selectedState && selectedExamType === "sa" && (
-            <motion.div
-              variants={slideUp}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="px-4 py-8 text-center"
-            >
-              <div
-                className="rounded-2xl py-8 px-6"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(245,158,11,0.2)",
-                }}
-              >
-                <div className="text-4xl mb-3">🚀</div>
-                <div className="font-heading font-bold text-white text-lg mb-1">Coming Soon!</div>
-                <div className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  SA subjects త్వరలో వస్తాయి...
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
     </div>
   );
 };
