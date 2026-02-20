@@ -259,54 +259,8 @@ const Index = () => {
         </div>
       </motion.div>
 
-      {/* Stats Row */}
-      <motion.div
-        className="px-4 mb-5"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.55 }}
-      >
-        <div className="grid grid-cols-3 gap-3">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              className="relative overflow-hidden rounded-2xl flex flex-col items-center justify-center py-4 px-2"
-              style={{
-                background: "linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
-                border: `1px solid ${stat.color}33`,
-                boxShadow: `0 0 18px ${stat.glow}, inset 0 0 12px rgba(255,255,255,0.03)`,
-              }}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.6 + i * 0.1, ease: easeOut }}
-              whileHover={{ scale: 1.05 }}
-            >
-              {/* Icon with glow */}
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center mb-2"
-                style={{ background: `${stat.color}22`, boxShadow: `0 0 10px ${stat.glow}` }}
-              >
-                <stat.icon style={{ color: stat.color }} className="h-5 w-5" />
-              </div>
-              {/* Animated number */}
-              <div
-                className="font-heading font-extrabold text-2xl leading-none"
-                style={{ color: stat.color, textShadow: `0 0 12px ${stat.glow}` }}
-              >
-                <AnimatedCounter target={stat.target} suffix={stat.suffix} />
-              </div>
-              <div className="text-white/50 text-[10px] mt-1 font-semibold tracking-wide uppercase">
-                {stat.label}
-              </div>
-              {/* Corner shimmer */}
-              <div
-                className="absolute -top-4 -right-4 w-10 h-10 rounded-full blur-xl opacity-40"
-                style={{ background: stat.color }}
-              />
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+
+
 
       {/* Select Your State */}
       <div className="px-4 mb-4">
