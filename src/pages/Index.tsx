@@ -131,76 +131,123 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: "linear-gradient(180deg, #0a0a1a 0%, #0d1128 40%, #0a1020 100%)" }}>
-
+    <div
+      className="min-h-screen pb-24"
+      style={{
+        background: "radial-gradient(ellipse at 50% 0%, #0d1f4a 0%, #060c1a 45%, #040810 100%)",
+      }}
+    >
       {/* Hero Section */}
       <motion.div
-        className="relative px-4 pt-6 pb-6 overflow-hidden"
+        className="relative px-4 pt-5 pb-7 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.7 }}
       >
-        {/* Star particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+        {/* Cinematic background orbs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Orange glow left */}
+          <div
+            className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full blur-3xl opacity-25"
+            style={{ background: "radial-gradient(circle, #ea580c, transparent 70%)" }}
+          />
+          {/* Blue glow right */}
+          <div
+            className="absolute -top-10 -right-10 w-56 h-56 rounded-full blur-3xl opacity-30"
+            style={{ background: "radial-gradient(circle, #1d4ed8, transparent 70%)" }}
+          />
+          {/* Center gold glow */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-20 blur-2xl opacity-15"
+            style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)" }}
+          />
+          {/* Twinkling stars */}
+          {[...Array(24)].map((_, i) => (
             <motion.div
               key={i}
               className="absolute rounded-full bg-white"
               style={{
-                width: Math.random() * 2 + 1 + "px",
-                height: Math.random() * 2 + 1 + "px",
-                top: Math.random() * 100 + "%",
-                left: Math.random() * 100 + "%",
+                width: (i % 3 === 0 ? 2 : 1) + "px",
+                height: (i % 3 === 0 ? 2 : 1) + "px",
+                top: (i * 4.1) % 100 + "%",
+                left: (i * 7.3) % 100 + "%",
               }}
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 2 + Math.random() * 2, repeat: Infinity, delay: Math.random() * 2 }}
+              animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.5, 1] }}
+              transition={{
+                duration: 2.5 + (i % 4),
+                repeat: Infinity,
+                delay: (i * 0.3) % 3,
+              }}
             />
           ))}
         </div>
 
-        {/* Golden glow orb */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 rounded-full opacity-20 blur-3xl"
-          style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)" }} />
-
         <div className="relative z-10 text-center">
-          {/* AP & TG Banner */}
+          {/* AP & TG golden badge */}
           <motion.div
-            className="inline-block mb-3"
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="inline-flex flex-col items-center mb-4"
+            initial={{ opacity: 0, y: -24, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.55, delay: 0.1, ease: easeOut }}
           >
-            <div className="relative">
-              <span className="absolute -left-6 top-1/2 -translate-y-1/2 text-2xl">🏆</span>
-              <span className="absolute -right-6 top-1/2 -translate-y-1/2 text-2xl">🏆</span>
+            {/* Laurel row */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">🌿</span>
               <div
-                className="px-8 py-2 rounded-lg"
+                className="px-6 py-1.5 rounded-xl"
                 style={{
-                  background: "linear-gradient(135deg, #b45309, #f59e0b, #d97706)",
-                  boxShadow: "0 0 20px rgba(245, 158, 11, 0.5)",
+                  background: "linear-gradient(135deg, #92400e, #d97706, #f59e0b, #d97706, #92400e)",
+                  boxShadow: "0 0 24px rgba(245,158,11,0.55), 0 0 48px rgba(245,158,11,0.2)",
+                  border: "1px solid rgba(255,200,50,0.3)",
                 }}
               >
-                <div className="font-heading font-extrabold text-2xl leading-tight"
-                  style={{ color: "#fff", textShadow: "0 0 10px rgba(245,158,11,0.8)" }}>
+                <span
+                  className="font-heading font-extrabold text-3xl tracking-tight"
+                  style={{
+                    color: "#fff",
+                    textShadow: "0 0 12px rgba(255,200,50,0.9), 0 2px 4px rgba(0,0,0,0.5)",
+                    letterSpacing: "0.04em",
+                  }}
+                >
                   AP & TG
-                </div>
-                <div className="text-xs font-bold italic" style={{ color: "#fef3c7" }}>
-                  Competitive Exams
-                </div>
+                </span>
               </div>
+              <span className="text-xl">🌿</span>
+            </div>
+            {/* Competitive Exams subtitle under badge */}
+            <div
+              className="px-5 py-1 rounded-lg"
+              style={{
+                background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.08))",
+                border: "1px solid rgba(245,158,11,0.2)",
+              }}
+            >
+              <span
+                className="text-sm font-bold italic tracking-wide"
+                style={{ color: "#fde68a" }}
+              >
+                Competitive Exams
+              </span>
             </div>
           </motion.div>
 
-          {/* Best Study Platform */}
+          {/* Best Study Platform headline */}
           <motion.div
             className="mb-2"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.22, ease: easeOut }}
           >
-            <h1 className="font-heading font-extrabold text-3xl leading-tight text-white">
+            <h1 className="font-heading font-extrabold text-[2rem] leading-tight text-white tracking-tight">
               Best{" "}
-              <span style={{ color: "#f59e0b", textShadow: "0 0 15px rgba(245,158,11,0.6)" }}>
+              <span
+                style={{
+                  background: "linear-gradient(90deg, #f59e0b, #fbbf24)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "drop-shadow(0 0 12px rgba(245,158,11,0.7))",
+                }}
+              >
                 Study
               </span>{" "}
               Platform 🎯
@@ -211,45 +258,55 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.32 }}
           >
             <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-yellow-400 text-xs">✦</span>
-              <p className="text-white/70 text-xs">Complete Preparation with</p>
-              <span className="text-yellow-400 text-xs">✦</span>
+              <span style={{ color: "#f59e0b" }} className="text-xs">✦</span>
+              <p className="text-white/65 text-xs font-medium">Complete Preparation with</p>
+              <span style={{ color: "#f59e0b" }} className="text-xs">✦</span>
             </div>
-            <p className="text-white/60 text-xs mb-5">
-              📚 Test Series, Notes & Live Classes 🚀
-            </p>
+            <div className="flex items-center justify-center gap-1.5 mb-5">
+              <span className="text-sm">📚</span>
+              <p className="text-white/50 text-xs">Test Series, Notes & Live Classes</p>
+              <span className="text-sm">🚀</span>
+            </div>
           </motion.div>
 
           {/* CTA Buttons */}
           <motion.div
             className="flex gap-3 justify-center"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.42, ease: easeOut }}
           >
             <motion.button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm text-white"
+              className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"
               style={{
-                background: "linear-gradient(135deg, #ea580c, #f97316)",
-                boxShadow: "0 4px 15px rgba(249,115,22,0.5)",
+                background: "linear-gradient(135deg, #c2410c, #ea580c, #f97316)",
+                boxShadow: "0 4px 20px rgba(234,88,12,0.55), 0 0 40px rgba(234,88,12,0.2)",
+                border: "1px solid rgba(249,115,22,0.4)",
               }}
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, boxShadow: "0 6px 20px rgba(249,115,22,0.7)" }}
+              whileTap={{ scale: 0.94 }}
+              whileHover={{
+                scale: 1.06,
+                boxShadow: "0 6px 28px rgba(234,88,12,0.75), 0 0 50px rgba(234,88,12,0.3)",
+              }}
             >
               <Rocket className="h-4 w-4" />
               Start Practice
             </motion.button>
             <motion.button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm text-white"
+              className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"
               style={{
-                background: "linear-gradient(135deg, #1d4ed8, #3b82f6)",
-                boxShadow: "0 4px 15px rgba(59,130,246,0.5)",
+                background: "linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6)",
+                boxShadow: "0 4px 20px rgba(29,78,216,0.55), 0 0 40px rgba(29,78,216,0.2)",
+                border: "1px solid rgba(59,130,246,0.4)",
               }}
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.05, boxShadow: "0 6px 20px rgba(59,130,246,0.7)" }}
+              whileTap={{ scale: 0.94 }}
+              whileHover={{
+                scale: 1.06,
+                boxShadow: "0 6px 28px rgba(29,78,216,0.75), 0 0 50px rgba(29,78,216,0.3)",
+              }}
             >
               <BookOpen className="h-4 w-4" />
               Courses
