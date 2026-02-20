@@ -99,17 +99,21 @@ export function SubjectGrid({ examType }: SubjectGridProps) {
               </div>
 
               {/* Subject name at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 p-2.5">
+              <div className="absolute bottom-0 left-0 right-0 p-3">
                 <span
-                  className="font-heading font-bold text-xs leading-tight text-white drop-shadow-lg block"
-                  style={{ textShadow: "0 1px 8px rgba(0,0,0,0.9)" }}
+                  className="font-heading font-black text-base leading-tight block"
+                  style={{
+                    color: subject.accentColor,
+                    textShadow: `0 0 18px ${subject.accentColor}cc, 0 2px 10px rgba(0,0,0,0.95)`,
+                    filter: `drop-shadow(0 0 6px ${subject.accentColor}99)`,
+                  }}
                 >
                   {subject.name}
                 </span>
                 {/* Accent underline */}
                 <div
-                  className="h-[2px] mt-1 rounded-full w-0 group-hover:w-full transition-all duration-400"
-                  style={{ background: subject.accentColor }}
+                  className="h-[2px] mt-1 rounded-full w-0 group-hover:w-full transition-all duration-300"
+                  style={{ background: `linear-gradient(90deg, ${subject.accentColor}, transparent)` }}
                 />
               </div>
             </div>
