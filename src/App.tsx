@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import Index from "./pages/Index";
 import SubjectDetail from "./pages/SubjectDetail";
+import SubjectsPage from "./pages/SubjectsPage";
 import ExamList from "./pages/ExamList";
 import ExamTake from "./pages/ExamTake";
 import ExamResult from "./pages/ExamResult";
@@ -32,6 +33,7 @@ const App = () => (
             <AppHeader />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/subjects/:examType" element={<SubjectsPage />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/subject/:subjectId" element={<SubjectDetail />} />
               <Route path="/exams/:subjectSlug" element={<ExamList />} />
