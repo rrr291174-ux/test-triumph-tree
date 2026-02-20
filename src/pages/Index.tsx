@@ -139,7 +139,7 @@ const Index = () => {
       style={{
         background: isDark
           ? "radial-gradient(ellipse at 50% 0%, #0d1f4a 0%, #060c1a 45%, #040810 100%)"
-          : "radial-gradient(ellipse at 50% 0%, #dbeafe 0%, #f0f4ff 45%, #f8faff 100%)",
+          : "linear-gradient(160deg, #fff7ed 0%, #fef3c7 15%, #dbeafe 45%, #ede9fe 75%, #fce7f3 100%)",
       }}
     >
       {/* Hero Section */}
@@ -149,24 +149,28 @@ const Index = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.7 }}
       >
-        {/* Cinematic background orbs */}
+        {/* Background orbs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Orange glow left */}
           <div
-            className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full blur-3xl opacity-25"
-            style={{ background: "radial-gradient(circle, #ea580c, transparent 70%)" }}
+            className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full blur-3xl"
+            style={{ background: isDark ? "radial-gradient(circle, #ea580c, transparent 70%)" : "radial-gradient(circle, rgba(249,115,22,0.25), transparent 70%)", opacity: isDark ? 0.25 : 1 }}
           />
-          {/* Blue glow right */}
           <div
-            className="absolute -top-10 -right-10 w-56 h-56 rounded-full blur-3xl opacity-30"
-            style={{ background: "radial-gradient(circle, #1d4ed8, transparent 70%)" }}
+            className="absolute -top-10 -right-10 w-56 h-56 rounded-full blur-3xl"
+            style={{ background: isDark ? "radial-gradient(circle, #1d4ed8, transparent 70%)" : "radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%)", opacity: isDark ? 0.3 : 1 }}
           />
-          {/* Center gold glow */}
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-20 blur-2xl opacity-15"
-            style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)" }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-20 blur-2xl"
+            style={{ background: "radial-gradient(ellipse, #f59e0b, transparent)", opacity: isDark ? 0.15 : 0.12 }}
           />
-          {/* Twinkling stars — dark mode only */}
+          {/* Light mode: floating soft circles for depth */}
+          {!isDark && (
+            <>
+              <div className="absolute top-1/3 left-0 w-40 h-40 rounded-full blur-3xl" style={{ background: "radial-gradient(circle, rgba(249,115,22,0.15), transparent 70%)" }} />
+              <div className="absolute bottom-0 right-1/4 w-32 h-32 rounded-full blur-2xl" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.18), transparent 70%)" }} />
+            </>
+          )}
+          {/* Dark mode: stars */}
           {isDark && [...Array(24)].map((_, i) => (
             <motion.div
               key={i}
@@ -178,11 +182,7 @@ const Index = () => {
                 left: (i * 7.3) % 100 + "%",
               }}
               animate={{ opacity: [0.2, 0.9, 0.2], scale: [1, 1.5, 1] }}
-              transition={{
-                duration: 2.5 + (i % 4),
-                repeat: Infinity,
-                delay: (i * 0.3) % 3,
-              }}
+              transition={{ duration: 2.5 + (i % 4), repeat: Infinity, delay: (i * 0.3) % 3 }}
             />
           ))}
         </div>
@@ -223,13 +223,15 @@ const Index = () => {
             <div
               className="px-5 py-1 rounded-lg"
               style={{
-                background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.08))",
-                border: "1px solid rgba(245,158,11,0.2)",
+                background: isDark
+                  ? "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.08))"
+                  : "linear-gradient(135deg, rgba(245,158,11,0.18), rgba(234,88,12,0.12))",
+                border: isDark ? "1px solid rgba(245,158,11,0.2)" : "1px solid rgba(245,158,11,0.35)",
               }}
             >
               <span
                 className="text-sm font-bold italic tracking-wide"
-                style={{ color: "#fde68a" }}
+                style={{ color: isDark ? "#fde68a" : "#92400e" }}
               >
                 Competitive Exams
               </span>
@@ -243,14 +245,14 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.22, ease: easeOut }}
           >
-            <h1 className="font-heading font-black text-[2.6rem] leading-[1.1] text-white tracking-tight drop-shadow-lg">
+            <h1 className="font-heading font-black text-[2.6rem] leading-[1.1] tracking-tight drop-shadow-lg" style={{ color: isDark ? "#fff" : "#1e1b4b" }}>
               Best{" "}
               <span
                 style={{
-                  background: "linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a)",
+                  background: "linear-gradient(90deg, #f59e0b, #ea580c)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  filter: "drop-shadow(0 0 18px rgba(245,158,11,0.85))",
+                  filter: isDark ? "drop-shadow(0 0 18px rgba(245,158,11,0.85))" : "drop-shadow(0 2px 8px rgba(245,158,11,0.4))",
                 }}
               >
                 Study
@@ -258,7 +260,9 @@ const Index = () => {
               <br />
               <span
                 style={{
-                  background: "linear-gradient(90deg, #ffffff, #e0e7ff)",
+                  background: isDark
+                    ? "linear-gradient(90deg, #ffffff, #e0e7ff)"
+                    : "linear-gradient(90deg, #1e3a8a, #4f46e5)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -399,7 +403,9 @@ const Index = () => {
                   className="absolute inset-0"
                   style={{
                     borderRadius: "20px",
-                    background: "linear-gradient(90deg, rgba(10,15,40,0.88) 0%, rgba(10,15,40,0.75) 45%, rgba(10,15,40,0.15) 75%, transparent 100%)",
+                    background: isDark
+                      ? "linear-gradient(90deg, rgba(10,15,40,0.88) 0%, rgba(10,15,40,0.75) 45%, rgba(10,15,40,0.15) 75%, transparent 100%)"
+                      : "linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
                   }}
                 />
 
@@ -545,8 +551,9 @@ const Index = () => {
                       onClick={() => handleExamTypeSelect(et.id)}
                       className="flex-1 relative overflow-hidden rounded-2xl border-2"
                       style={{
-                        borderColor: isActive ? "transparent" : "rgba(255,255,255,0.1)",
-                        background: isActive ? undefined : "rgba(255,255,255,0.05)",
+                        borderColor: isActive ? "transparent" : isDark ? "rgba(255,255,255,0.1)" : "rgba(30,58,138,0.15)",
+                        background: isActive ? undefined : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)",
+                        boxShadow: isActive ? undefined : isDark ? "none" : "0 4px 16px rgba(0,0,0,0.06)",
                       }}
                       variants={examTypeItem}
                       whileTap={{ scale: 0.95 }}
@@ -570,10 +577,10 @@ const Index = () => {
                           {et.emoji}
                         </motion.span>
                         <div>
-                          <div className="font-heading font-extrabold text-xl text-white">
+                          <div className="font-heading font-extrabold text-xl" style={{ color: isActive ? "#fff" : isDark ? "#fff" : "#1e3a8a" }}>
                             {et.label}
                           </div>
-                          <div className={`text-[10px] ${isActive ? "text-white/80" : "text-white/50"} text-center leading-tight`}>
+                          <div className="text-[10px] text-center leading-tight" style={{ color: isActive ? "rgba(255,255,255,0.8)" : isDark ? "rgba(255,255,255,0.5)" : "rgba(30,58,138,0.6)" }}>
                             {et.fullName}
                           </div>
                         </div>
