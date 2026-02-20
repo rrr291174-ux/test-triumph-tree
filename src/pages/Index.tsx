@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { SubjectGrid } from "@/components/SubjectGrid";
 import { ChevronRight, GraduationCap, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
-import apStateCard from "@/assets/ap-map-3d.png";
-import tsStateCard from "@/assets/ts-map-3d.png";
+import apStateCard from "@/assets/ap-state-card.png";
+import tsStateCard from "@/assets/ts-state-card.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -375,67 +375,73 @@ const Index = () => {
                 key={state.id}
                 onClick={() => handleStateSelect(state.id)}
                 className="w-full text-left relative overflow-hidden"
-                style={{ borderRadius: "24px" }}
+                style={{ borderRadius: "20px", minHeight: "130px" }}
                 variants={subjectItem}
                 animate={isSelected ? { scale: 1.025 } : { scale: 1 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                {/* Dark glass card background */}
+                {/* Full scenic background image */}
+                <img
+                  src={state.image}
+                  alt={`${state.name}`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ borderRadius: "20px" }}
+                />
+
+                {/* Left gradient overlay for text readability */}
                 <div
-                  className="absolute inset-0 rounded-[24px]"
+                  className="absolute inset-0"
                   style={{
-                    background: "linear-gradient(135deg, rgba(15,25,60,0.96) 0%, rgba(8,14,40,0.98) 60%, rgba(5,10,30,1) 100%)",
-                    backdropFilter: "blur(20px)",
+                    borderRadius: "20px",
+                    background: "linear-gradient(90deg, rgba(10,15,40,0.88) 0%, rgba(10,15,40,0.75) 45%, rgba(10,15,40,0.15) 75%, transparent 100%)",
                   }}
                 />
 
                 {/* Glow border */}
                 <motion.div
-                  className="absolute inset-0 rounded-[24px]"
+                  className="absolute inset-0"
+                  style={{ borderRadius: "20px" }}
                   animate={{
                     boxShadow: isSelected
-                      ? "0 0 30px rgba(249,115,22,0.55), 0 0 60px rgba(249,115,22,0.2), inset 0 0 0 2px rgba(249,115,22,0.8)"
-                      : "0 4px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(245,158,11,0.25)",
+                      ? "0 0 28px rgba(249,115,22,0.65), 0 0 55px rgba(249,115,22,0.25), inset 0 0 0 2.5px rgba(249,115,22,0.9)"
+                      : "0 6px 28px rgba(0,0,0,0.6), inset 0 0 0 1.5px rgba(245,158,11,0.35)",
                   }}
-                  transition={{ duration: 0.35 }}
-                />
-
-                {/* Top golden gloss line */}
-                <div
-                  className="absolute top-0 left-6 right-6 h-px rounded-full"
-                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,200,80,0.4), transparent)" }}
+                  transition={{ duration: 0.3 }}
                 />
 
                 {/* Selected golden top bar */}
                 <AnimatePresence>
                   {isSelected && (
                     <motion.div
-                      className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[24px]"
-                      style={{ background: "linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent)" }}
+                      className="absolute top-0 left-0 right-0 h-[3px]"
+                      style={{
+                        borderRadius: "20px 20px 0 0",
+                        background: "linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent)",
+                      }}
                       initial={{ scaleX: 0, opacity: 0 }}
                       animate={{ scaleX: 1, opacity: 1 }}
                       exit={{ scaleX: 0, opacity: 0 }}
-                      transition={{ duration: 0.45 }}
+                      transition={{ duration: 0.4 }}
                     />
                   )}
                 </AnimatePresence>
 
                 {/* Indian tricolor ribbon at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-2 rounded-b-[24px] overflow-hidden">
-                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors} opacity-80`} />
+                <div className="absolute bottom-0 left-0 right-0 h-[5px] overflow-hidden" style={{ borderRadius: "0 0 20px 20px" }}>
+                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors}`} />
                 </div>
 
-                <div className="relative z-10 p-5 flex items-center gap-4">
-                  {/* Text content */}
+                {/* Text content overlay */}
+                <div className="relative z-10 p-4 flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    {/* State name - same size bold */}
+                    {/* State name */}
                     <div
-                      className="font-heading font-extrabold text-[1.35rem] leading-tight tracking-tight mb-1.5"
+                      className="font-heading font-black text-[1.45rem] leading-tight tracking-tight mb-1"
                       style={{
-                        background: "linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
+                        color: "#fff",
+                        textShadow: "0 2px 12px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.5)",
+                        letterSpacing: "-0.01em",
                       }}
                     >
                       {state.name}
@@ -443,58 +449,37 @@ const Index = () => {
 
                     {/* Capital subtitle */}
                     <div className="flex items-center gap-1.5 mb-3">
-                      <div
-                        className="flex items-center justify-center w-4 h-4 rounded-full"
-                        style={{ background: "rgba(249,115,22,0.2)", border: "1px solid rgba(249,115,22,0.4)" }}
+                      <MapPin className="h-3 w-3 flex-shrink-0" style={{ color: "#f97316" }} />
+                      <span
+                        className="text-xs font-semibold"
+                        style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
                       >
-                        <MapPin className="h-2.5 w-2.5" style={{ color: "#f97316" }} />
-                      </div>
-                      <span className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
-                        Capital: {state.capital}
+                        {state.capital}
                       </span>
                     </div>
 
                     {/* Tags */}
                     <div
-                      className="inline-flex items-center px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wide"
+                      className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wide"
                       style={{
-                        background: "linear-gradient(135deg, rgba(234,88,12,0.3), rgba(249,115,22,0.2))",
-                        border: "1px solid rgba(249,115,22,0.4)",
-                        color: "#fdba74",
-                        boxShadow: "0 0 12px rgba(249,115,22,0.15)",
+                        background: "rgba(255,255,255,0.12)",
+                        border: "1px solid rgba(249,115,22,0.7)",
+                        color: "#fff",
+                        backdropFilter: "blur(8px)",
+                        boxShadow: "0 0 14px rgba(249,115,22,0.3)",
+                        textShadow: "0 1px 4px rgba(0,0,0,0.6)",
                       }}
                     >
-                      {state.desc}
+                      <span style={{ color: "#fb923c" }}>{state.desc}</span>
                     </div>
                   </div>
 
-                  {/* 3D Map image */}
-                  <div className="relative flex-shrink-0 w-28 h-28">
-                    {/* Map glow behind */}
-                    <div
-                      className="absolute inset-0 rounded-2xl blur-xl opacity-60"
-                      style={{ background: state.id === "ap" ? "radial-gradient(circle, #16a34a, transparent 70%)" : "radial-gradient(circle, #be185d, transparent 70%)" }}
-                    />
-                    <img
-                      src={state.image}
-                      alt={`${state.name} 3D map`}
-                      className="relative w-full h-full object-cover rounded-2xl"
-                      style={{
-                        filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.6)) saturate(1.2) brightness(1.05)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    />
-                  </div>
-
-                  {/* Arrow indicator */}
+                  {/* Arrow button */}
                   <motion.div
-                    className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ml-3"
                     style={{
-                      background: isSelected
-                        ? "linear-gradient(135deg, #ea580c, #f97316)"
-                        : "rgba(255,255,255,0.07)",
-                      border: isSelected ? "none" : "1px solid rgba(255,255,255,0.15)",
-                      boxShadow: isSelected ? "0 4px 14px rgba(249,115,22,0.6)" : "none",
+                      background: "linear-gradient(135deg, #ea580c, #f97316)",
+                      boxShadow: "0 4px 16px rgba(249,115,22,0.7)",
                     }}
                     animate={isSelected ? { rotate: 90 } : { rotate: 0 }}
                     transition={{ type: "spring", stiffness: 250, damping: 18 }}
