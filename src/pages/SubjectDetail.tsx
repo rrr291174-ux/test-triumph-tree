@@ -1,13 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, ClipboardList, Globe, BookOpen, Video, CreditCard } from "lucide-react";
+import { ArrowLeft, FileText, BookOpen, Video } from "lucide-react";
 
 const resourceTypes = [
   { id: "exams", name: "Exams", icon: FileText, color: "gradient-primary", count: null, link: true },
-  { id: "test-series", name: "Test Series", icon: ClipboardList, color: "gradient-secondary", count: 12 },
-  { id: "web-tests", name: "Web Tests", icon: Globe, color: "gradient-success", count: 15 },
-  { id: "notes", name: "Notes", icon: BookOpen, color: "gradient-primary", count: 20 },
-  { id: "classes", name: "Classes", icon: Video, color: "gradient-secondary", count: 10 },
-  { id: "class-cards", name: "Class Cards", icon: CreditCard, color: "gradient-success", count: 6 },
+  { id: "material", name: "Material", icon: BookOpen, color: "gradient-secondary", count: null },
+  { id: "classes", name: "Classes", icon: Video, color: "gradient-success", count: null },
 ];
 
 export default function SubjectDetail() {
