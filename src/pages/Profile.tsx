@@ -74,34 +74,19 @@ export default function Profile() {
 
       <div className="px-4 mt-4 space-y-2">
         {isAdmin && (
-          <div className="space-y-2">
-            <Link
-              to="/admin/exams"
-              className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border-2 border-primary/30 hover:shadow-card-hover transition-all"
-            >
-              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-                <Shield className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm text-primary">Admin: Manage Exams</div>
-                <div className="text-[11px] text-muted-foreground">Edit, publish or delete exams</div>
-              </div>
-              <ChevronRight className="h-4 w-4 text-primary" />
-            </Link>
-            <Link
-              to="/admin/upload"
-              className="flex items-center gap-3 p-3 rounded-xl bg-muted border border-border/50 hover:shadow-card-hover transition-all"
-            >
-              <div className="w-10 h-10 rounded-xl bg-muted-foreground/10 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold text-sm text-foreground">Admin: Bulk Upload</div>
-                <div className="text-[11px] text-muted-foreground">Upload JSON exam files</div>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          </div>
+          <Link
+            to="/admin"
+            className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border-2 border-primary/30 hover:shadow-card-hover transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+              <Shield className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div className="flex-1">
+              <div className="font-semibold text-sm text-primary">Admin Dashboard</div>
+              <div className="text-[11px] text-muted-foreground">Manage exams, materials & classes</div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-primary" />
+          </Link>
         )}
 
         {menuItems.map((item, i) => {
