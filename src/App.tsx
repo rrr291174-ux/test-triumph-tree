@@ -12,6 +12,7 @@ import SubjectsPage from "./pages/SubjectsPage";
 import ExamList from "./pages/ExamList";
 import ExamTake from "./pages/ExamTake";
 import ExamResult from "./pages/ExamResult";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminUpload from "./pages/AdminUpload";
 import AdminExams from "./pages/AdminExams";
 import Auth from "./pages/Auth";
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/exams/:subjectSlug" element={<ExamList />} />
               <Route path="/exam/:examId" element={<ExamTake />} />
               <Route path="/exam-result/:attemptId" element={<ExamResult />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/upload" element={<AdminUpload />} />
               <Route path="/admin/exams" element={<AdminExams />} />
               <Route path="/profile" element={<Profile />} />
