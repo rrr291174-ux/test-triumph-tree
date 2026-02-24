@@ -2,9 +2,9 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, FileText, BookOpen, Video } from "lucide-react";
 
 const resourceTypes = [
-  { id: "exams", name: "Exams", icon: FileText, color: "gradient-primary", count: null, link: true },
-  { id: "material", name: "Material", icon: BookOpen, color: "gradient-secondary", count: null },
-  { id: "classes", name: "Classes", icon: Video, color: "gradient-success", count: null },
+  { id: "exams", name: "Exams", icon: FileText, color: "gradient-primary", count: null, link: "/exams" },
+  { id: "material", name: "Material", icon: BookOpen, color: "gradient-secondary", count: null, link: "/material" },
+  { id: "classes", name: "Classes", icon: Video, color: "gradient-success", count: null, link: "/classes" },
 ];
 
 export default function SubjectDetail() {
@@ -39,10 +39,7 @@ export default function SubjectDetail() {
             </div>
           );
 
-          if (resource.id === "exams") {
-            return <Link key={resource.id} to={`/exams/${subjectId}`}>{content}</Link>;
-          }
-          return <div key={resource.id}>{content}</div>;
+          return <Link key={resource.id} to={`${resource.link}/${subjectId}`}>{content}</Link>;
         })}
       </div>
     </div>

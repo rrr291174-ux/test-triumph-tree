@@ -75,7 +75,7 @@ export default function AdminDashboard() {
   const [matTitle, setMatTitle] = useState("");
   const [matDesc, setMatDesc] = useState("");
   const [matSubject, setMatSubject] = useState("");
-  const [matFile, setMatFile] = useState<File | null>(null);
+  const [matFiles, setMatFiles] = useState<File[]>([]);
   const [matUploading, setMatUploading] = useState(false);
   const matFileRef = useRef<HTMLInputElement>(null);
 
@@ -221,17 +221,20 @@ export default function AdminDashboard() {
 
   // ─── Material handler ───
   const handleAddMaterial = async () => {
-    if (!matTitle.trim() || !matSubject || !matFile) return;
+    if (!matTitle.trim() || !matSubject || matFiles.length === 0) return;
     setMatUploading(true);
     try {
-      const ext = matFile.name.split('.').pop();
-      const path = `${matSubject}/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("materials").upload(path, matFile);
-      if (upErr) throw upErr;
-      const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
-      await supabase.from("materials").insert({ subject_id: matSubject, title: matTitle.trim(), description: matDesc.trim() || null, file_url: urlData.publicUrl, file_type: ext, created_by: user!.id });
-      toast({ title: "✅ Material added!" });
-      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatSubject(""); setMatFile(null);
+      for (const file of matFiles) {
+        const ext = file.name.split('.').pop();
+        const path = `${matSubject}/${Date.now()}-${file.name}`;
+        const { error: upErr } = await supabase.storage.from("materials").upload(path, file);
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
+        const title = matFiles.length === 1 ? matTitle.trim() : `${matTitle.trim()} - ${file.name}`;
+        await supabase.from("materials").insert({ subject_id: matSubject, title, description: matDesc.trim() || null, file_url: urlData.publicUrl, file_type: ext, created_by: user!.id });
+      }
+      toast({ title: `✅ ${matFiles.length} material(s) added!` });
+      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatSubject(""); setMatFiles([]);
       fetchMaterials();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
@@ -465,14 +468,15 @@ export default function AdminDashboard() {
             <Input placeholder="Description (optional)" value={matDesc} onChange={e => setMatDesc(e.target.value)} className="rounded-xl" />
             <div onClick={() => matFileRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
               <BookOpen className="h-8 w-8 text-primary mx-auto mb-1" />
-              <p className="text-sm font-semibold">{matFile?.name || "Select PDF / File"}</p>
+              <p className="text-sm font-semibold">{matFiles.length > 0 ? `${matFiles.length} file(s) selected` : "Select Files (multi-select)"}</p>
+              {matFiles.length > 0 && <p className="text-xs text-muted-foreground mt-1">{matFiles.map(f => f.name).join(", ")}</p>}
             </div>
-            <input ref={matFileRef} type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png" onChange={e => setMatFile(e.target.files?.[0] || null)} className="hidden" />
+            <input ref={matFileRef} type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png,.jpeg,.webp" multiple onChange={e => setMatFiles(e.target.files ? Array.from(e.target.files) : [])} className="hidden" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddMaterial(false)}>Cancel</Button>
-            <Button onClick={handleAddMaterial} disabled={!matTitle.trim() || !matSubject || !matFile || matUploading}>
-              {matUploading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Upload
+            <Button onClick={handleAddMaterial} disabled={!matTitle.trim() || !matSubject || matFiles.length === 0 || matUploading}>
+              {matUploading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Upload {matFiles.length > 1 ? `(${matFiles.length})` : ""}
             </Button>
           </DialogFooter>
         </DialogContent>
