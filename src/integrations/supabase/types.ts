@@ -64,6 +64,7 @@ export type Database = {
           duration_minutes: number | null
           id: string
           is_published: boolean | null
+          state: string | null
           subject_id: string
           thumbnail_url: string | null
           title: string
@@ -77,6 +78,7 @@ export type Database = {
           duration_minutes?: number | null
           id?: string
           is_published?: boolean | null
+          state?: string | null
           subject_id: string
           thumbnail_url?: string | null
           title: string
@@ -90,6 +92,7 @@ export type Database = {
           duration_minutes?: number | null
           id?: string
           is_published?: boolean | null
+          state?: string | null
           subject_id?: string
           thumbnail_url?: string | null
           title?: string
@@ -215,6 +218,7 @@ export type Database = {
           file_url: string | null
           id: string
           is_published: boolean | null
+          state: string | null
           subject_id: string
           title: string
           updated_at: string
@@ -227,6 +231,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_published?: boolean | null
+          state?: string | null
           subject_id: string
           title: string
           updated_at?: string
@@ -239,6 +244,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_published?: boolean | null
+          state?: string | null
           subject_id?: string
           title?: string
           updated_at?: string

@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { ArrowLeft, FileText, BookOpen, Video } from "lucide-react";
 
 const resourceTypes = [
@@ -9,6 +9,8 @@ const resourceTypes = [
 
 export default function SubjectDetail() {
   const { subjectId } = useParams();
+  const [searchParams] = useSearchParams();
+  const state = searchParams.get("state") || "";
   const subjectName = subjectId?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Subject";
 
   return (
@@ -24,6 +26,10 @@ export default function SubjectDetail() {
 
       <div className="px-4 -mt-4 grid grid-cols-2 gap-3">
         {resourceTypes.map((resource, i) => {
+          const linkTo = state
+            ? `${resource.link}/${subjectId}?state=${state}`
+            : `${resource.link}/${subjectId}`;
+
           const content = (
             <div
               className="animate-slide-up bg-card rounded-2xl p-4 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border border-border/50 cursor-pointer"
@@ -39,7 +45,7 @@ export default function SubjectDetail() {
             </div>
           );
 
-          return <Link key={resource.id} to={`${resource.link}/${subjectId}`}>{content}</Link>;
+          return <Link key={resource.id} to={linkTo}>{content}</Link>;
         })}
       </div>
     </div>

@@ -88,7 +88,7 @@ export default function SubjectsPage() {
 
       {/* Subjects or Coming Soon */}
       {examType === "sgt" ? (
-        <SubjectGrid examType="sgt" />
+        <SubjectGrid examType="sgt" state={state} />
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 20 }}

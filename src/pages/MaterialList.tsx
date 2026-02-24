@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, BookOpen, FileText, Loader2, ExternalLink } from "lucide-react";
 
@@ -14,6 +14,8 @@ interface Material {
 
 export default function MaterialList() {
   const { subjectSlug } = useParams();
+  const [searchParams] = useSearchParams();
+  const state = searchParams.get("state") || "";
   const [materials, setMaterials] = useState<Material[]>([]);
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -29,23 +31,28 @@ export default function MaterialList() {
       if (!subject) { setLoading(false); return; }
       setSubjectName(subject.name);
 
-      const { data } = await supabase
+      let query = supabase
         .from("materials")
         .select("id, title, description, file_url, file_type, created_at")
         .eq("subject_id", subject.id)
         .eq("is_published", true)
         .order("created_at", { ascending: false });
 
+      if (state) {
+        query = query.in("state", [state, "both"]);
+      }
+
+      const { data } = await query;
       setMaterials(data || []);
       setLoading(false);
     };
     fetch();
-  }, [subjectSlug]);
+  }, [subjectSlug, state]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="gradient-hero px-4 pt-4 pb-8">
-        <Link to={`/subject/${subjectSlug}`} className="inline-flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground mb-3">
+        <Link to={`/subject/${subjectSlug}${state ? `?state=${state}` : ""}`} className="inline-flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground mb-3">
           <ArrowLeft className="h-5 w-5" />
           <span className="text-sm font-medium">Back</span>
         </Link>
