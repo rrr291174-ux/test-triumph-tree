@@ -10,6 +10,8 @@ import Index from "./pages/Index";
 import SubjectDetail from "./pages/SubjectDetail";
 import SubjectsPage from "./pages/SubjectsPage";
 import ExamList from "./pages/ExamList";
+import MaterialList from "./pages/MaterialList";
+import ClassesList from "./pages/ClassesList";
 import ExamTake from "./pages/ExamTake";
 import ExamResult from "./pages/ExamResult";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -38,6 +40,8 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/subject/:subjectId" element={<SubjectDetail />} />
               <Route path="/exams/:subjectSlug" element={<ExamList />} />
+              <Route path="/material/:subjectSlug" element={<MaterialList />} />
+              <Route path="/classes/:subjectSlug" element={<ClassesList />} />
               <Route path="/exam/:examId" element={<ExamTake />} />
               <Route path="/exam-result/:attemptId" element={<ExamResult />} />
               <Route path="/admin" element={<AdminDashboard />} />
