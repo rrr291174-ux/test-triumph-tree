@@ -37,9 +37,10 @@ const subjects: Subject[] = [
 
 interface SubjectGridProps {
   examType?: string;
+  state?: string;
 }
 
-export function SubjectGrid({ examType }: SubjectGridProps) {
+export function SubjectGrid({ examType, state }: SubjectGridProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -49,7 +50,7 @@ export function SubjectGrid({ examType }: SubjectGridProps) {
         {subjects.map((subject, i) => (
           <Link
             key={subject.id}
-            to={`/subject/${subject.id}`}
+            to={`/subject/${subject.id}${state ? `?state=${state}` : ""}`}
             className="group"
             style={{ animationDelay: `${i * 50}ms` }}
           >

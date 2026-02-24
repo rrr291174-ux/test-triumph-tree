@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Video, Clock, Loader2, ExternalLink } from "lucide-react";
 
@@ -14,6 +14,8 @@ interface ClassItem {
 
 export default function ClassesList() {
   const { subjectSlug } = useParams();
+  const [searchParams] = useSearchParams();
+  const state = searchParams.get("state") || "";
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -29,23 +31,28 @@ export default function ClassesList() {
       if (!subject) { setLoading(false); return; }
       setSubjectName(subject.name);
 
-      const { data } = await supabase
+      let query = supabase
         .from("classes")
         .select("id, title, description, video_url, duration_minutes, created_at")
         .eq("subject_id", subject.id)
         .eq("is_published", true)
         .order("created_at", { ascending: false });
 
+      if (state) {
+        query = query.in("state", [state, "both"]);
+      }
+
+      const { data } = await query;
       setClasses(data || []);
       setLoading(false);
     };
     fetch();
-  }, [subjectSlug]);
+  }, [subjectSlug, state]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="gradient-hero px-4 pt-4 pb-8">
-        <Link to={`/subject/${subjectSlug}`} className="inline-flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground mb-3">
+        <Link to={`/subject/${subjectSlug}${state ? `?state=${state}` : ""}`} className="inline-flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground mb-3">
           <ArrowLeft className="h-5 w-5" />
           <span className="text-sm font-medium">Back</span>
         </Link>

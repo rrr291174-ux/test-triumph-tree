@@ -75,6 +75,7 @@ export default function AdminDashboard() {
   const [matTitle, setMatTitle] = useState("");
   const [matDesc, setMatDesc] = useState("");
   const [matSubject, setMatSubject] = useState("");
+  const [matState, setMatState] = useState("both");
   const [matFiles, setMatFiles] = useState<File[]>([]);
   const [matUploading, setMatUploading] = useState(false);
   const matFileRef = useRef<HTMLInputElement>(null);
@@ -86,6 +87,7 @@ export default function AdminDashboard() {
   const [classTitle, setClassTitle] = useState("");
   const [classDesc, setClassDesc] = useState("");
   const [classSubject, setClassSubject] = useState("");
+  const [classState, setClassState] = useState("both");
   const [classUrl, setClassUrl] = useState("");
   const [classDuration, setClassDuration] = useState(60);
   const [classAdding, setClassAdding] = useState(false);
@@ -231,10 +233,10 @@ export default function AdminDashboard() {
         if (upErr) throw upErr;
         const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
         const title = matFiles.length === 1 ? matTitle.trim() : `${matTitle.trim()} - ${file.name}`;
-        await supabase.from("materials").insert({ subject_id: matSubject, title, description: matDesc.trim() || null, file_url: urlData.publicUrl, file_type: ext, created_by: user!.id });
+        await supabase.from("materials").insert({ subject_id: matSubject, title, description: matDesc.trim() || null, file_url: urlData.publicUrl, file_type: ext, created_by: user!.id, state: matState });
       }
       toast({ title: `✅ ${matFiles.length} material(s) added!` });
-      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatSubject(""); setMatFiles([]);
+      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatSubject(""); setMatState("both"); setMatFiles([]);
       fetchMaterials();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
@@ -247,9 +249,9 @@ export default function AdminDashboard() {
     if (!classTitle.trim() || !classSubject || !classUrl.trim()) return;
     setClassAdding(true);
     try {
-      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: classUrl.trim(), duration_minutes: classDuration, created_by: user!.id });
+      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: classUrl.trim(), duration_minutes: classDuration, created_by: user!.id, state: classState });
       toast({ title: "✅ Class added!" });
-      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassUrl(""); setClassDuration(60);
+      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60);
       fetchClasses();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
@@ -464,6 +466,11 @@ export default function AdminDashboard() {
               <option value="">Select Subject</option>
               {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            <select value={matState} onChange={e => setMatState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+              <option value="both">Both States</option>
+              <option value="ap">AP Only</option>
+              <option value="ts">TS Only</option>
+            </select>
             <Input placeholder="Material Title" value={matTitle} onChange={e => setMatTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={matDesc} onChange={e => setMatDesc(e.target.value)} className="rounded-xl" />
             <div onClick={() => matFileRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
@@ -490,6 +497,11 @@ export default function AdminDashboard() {
             <select value={classSubject} onChange={e => setClassSubject(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
               <option value="">Select Subject</option>
               {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <select value={classState} onChange={e => setClassState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+              <option value="both">Both States</option>
+              <option value="ap">AP Only</option>
+              <option value="ts">TS Only</option>
             </select>
             <Input placeholder="Class Title" value={classTitle} onChange={e => setClassTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={classDesc} onChange={e => setClassDesc(e.target.value)} className="rounded-xl" />
