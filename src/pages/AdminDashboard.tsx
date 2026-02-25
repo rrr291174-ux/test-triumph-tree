@@ -5,7 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, AlertCircle, Pencil, Trash2, Eye, EyeOff,
   CheckCircle, XCircle, Search, Upload, FileJson, BookOpen, Video,
-  FileText, Plus, Link as LinkIcon, X
+  FileText, Plus, Link as LinkIcon, X, FolderPlus, Folder, FolderOpen, ChevronRight
 } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,12 +28,15 @@ interface Exam {
 interface Material {
   id: string; title: string; description: string | null; subject_id: string;
   file_url: string | null; file_type: string | null; is_published: boolean | null;
-  created_at: string; subjects?: { name: string } | null;
+  created_at: string; folder_id: string | null; subjects?: { name: string } | null;
 }
 interface ClassItem {
   id: string; title: string; description: string | null; subject_id: string;
   video_url: string | null; duration_minutes: number | null; is_published: boolean | null;
   created_at: string; subjects?: { name: string } | null;
+}
+interface FolderItem {
+  id: string; name: string; subject_id: string; state: string; created_at: string;
 }
 
 type Tab = "exams" | "material" | "classes";
@@ -68,17 +71,33 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // ─── Material state ───
+  // ─── Material / Folder state ───
   const [materials, setMaterials] = useState<Material[]>([]);
   const [materialsLoading, setMaterialsLoading] = useState(true);
+  const [folders, setFolders] = useState<FolderItem[]>([]);
+  const [foldersLoading, setFoldersLoading] = useState(true);
+  const [matFilterState, setMatFilterState] = useState("");
+  const [matFilterSubject, setMatFilterSubject] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState<FolderItem | null>(null);
+
+  // Create folder
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderState, setNewFolderState] = useState("both");
+  const [newFolderSubject, setNewFolderSubject] = useState("");
+  const [creatingFolder, setCreatingFolder] = useState(false);
+
+  // Upload to folder
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [matTitle, setMatTitle] = useState("");
   const [matDesc, setMatDesc] = useState("");
-  const [matSubject, setMatSubject] = useState("");
-  const [matState, setMatState] = useState("both");
   const [matFiles, setMatFiles] = useState<File[]>([]);
   const [matUploading, setMatUploading] = useState(false);
   const matFileRef = useRef<HTMLInputElement>(null);
+
+  // Delete folder
+  const [deleteFolderTarget, setDeleteFolderTarget] = useState<FolderItem | null>(null);
+  const [deletingFolder, setDeletingFolder] = useState(false);
 
   // ─── Classes state ───
   const [classes, setClasses] = useState<ClassItem[]>([]);
@@ -110,12 +129,23 @@ export default function AdminDashboard() {
     setExamsLoading(false);
   };
 
+  // Load folders
+  const fetchFolders = async () => {
+    setFoldersLoading(true);
+    const { data } = await supabase
+      .from("folders")
+      .select("id, name, subject_id, state, created_at")
+      .order("created_at", { ascending: false });
+    setFolders((data as FolderItem[]) || []);
+    setFoldersLoading(false);
+  };
+
   // Load materials
   const fetchMaterials = async () => {
     setMaterialsLoading(true);
     const { data } = await supabase
       .from("materials")
-      .select("id, title, description, subject_id, file_url, file_type, is_published, created_at, subjects(name)")
+      .select("id, title, description, subject_id, file_url, file_type, is_published, created_at, folder_id, subjects(name)")
       .order("created_at", { ascending: false });
     setMaterials((data as Material[]) || []);
     setMaterialsLoading(false);
@@ -133,7 +163,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); }
+    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); }
   }, [isAdmin]);
 
   // Auth guards
@@ -221,22 +251,64 @@ export default function AdminDashboard() {
     setUploading(false);
   };
 
-  // ─── Material handler ───
+  // ─── Folder handlers ───
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim() || !newFolderSubject) return;
+    setCreatingFolder(true);
+    try {
+      await supabase.from("folders").insert({
+        name: newFolderName.trim(),
+        subject_id: newFolderSubject,
+        state: newFolderState,
+        created_by: user!.id,
+      });
+      toast({ title: "📁 Folder created!" });
+      setShowCreateFolder(false); setNewFolderName(""); setNewFolderSubject(""); setNewFolderState("both");
+      fetchFolders();
+    } catch (err: any) {
+      toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
+    }
+    setCreatingFolder(false);
+  };
+
+  const handleDeleteFolder = async () => {
+    if (!deleteFolderTarget) return;
+    setDeletingFolder(true);
+    // Materials inside will be cascade deleted
+    await supabase.from("folders").delete().eq("id", deleteFolderTarget.id);
+    setFolders(p => p.filter(f => f.id !== deleteFolderTarget.id));
+    setMaterials(p => p.filter(m => m.folder_id !== deleteFolderTarget.id));
+    if (selectedFolder?.id === deleteFolderTarget.id) setSelectedFolder(null);
+    setDeleteFolderTarget(null);
+    setDeletingFolder(false);
+    toast({ title: "🗑️ Folder deleted" });
+  };
+
+  // ─── Material handler (into folder) ───
   const handleAddMaterial = async () => {
-    if (!matTitle.trim() || !matSubject || matFiles.length === 0) return;
+    if (!selectedFolder || matFiles.length === 0) return;
     setMatUploading(true);
     try {
       for (const file of matFiles) {
         const ext = file.name.split('.').pop();
-        const path = `${matSubject}/${Date.now()}-${file.name}`;
+        const path = `${selectedFolder.subject_id}/${selectedFolder.id}/${Date.now()}-${file.name}`;
         const { error: upErr } = await supabase.storage.from("materials").upload(path, file);
         if (upErr) throw upErr;
         const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
-        const title = matFiles.length === 1 ? matTitle.trim() : `${matTitle.trim()} - ${file.name}`;
-        await supabase.from("materials").insert({ subject_id: matSubject, title, description: matDesc.trim() || null, file_url: urlData.publicUrl, file_type: ext, created_by: user!.id, state: matState });
+        const title = matTitle.trim() ? (matFiles.length === 1 ? matTitle.trim() : `${matTitle.trim()} - ${file.name}`) : file.name;
+        await supabase.from("materials").insert({
+          subject_id: selectedFolder.subject_id,
+          title,
+          description: matDesc.trim() || null,
+          file_url: urlData.publicUrl,
+          file_type: ext,
+          created_by: user!.id,
+          state: selectedFolder.state,
+          folder_id: selectedFolder.id,
+        });
       }
-      toast({ title: `✅ ${matFiles.length} material(s) added!` });
-      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatSubject(""); setMatState("both"); setMatFiles([]);
+      toast({ title: `✅ ${matFiles.length} file(s) uploaded!` });
+      setShowAddMaterial(false); setMatTitle(""); setMatDesc(""); setMatFiles([]);
       fetchMaterials();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
@@ -290,8 +362,20 @@ export default function AdminDashboard() {
   ];
 
   const filteredExams = exams.filter(e => e.title.toLowerCase().includes(search.toLowerCase()));
-  const filteredMaterials = materials.filter(m => m.title.toLowerCase().includes(search.toLowerCase()));
   const filteredClasses = classes.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
+
+  // Filtered folders by state & subject
+  const filteredFolders = folders.filter(f => {
+    if (matFilterState && f.state !== matFilterState && f.state !== "both") return false;
+    if (matFilterSubject && f.subject_id !== matFilterSubject) return false;
+    if (search && !f.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  // Materials inside selected folder
+  const folderMaterials = selectedFolder
+    ? materials.filter(m => m.folder_id === selectedFolder.id)
+    : [];
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -318,7 +402,7 @@ export default function AdminDashboard() {
           {tabs.map(t => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => { setTab(t.id); setSelectedFolder(null); }}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                 tab === t.id ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:bg-muted"
               }`}
@@ -368,32 +452,100 @@ export default function AdminDashboard() {
         {/* ═══ MATERIAL TAB ═══ */}
         {tab === "material" && (
           <div className="space-y-3">
-            <button onClick={() => setShowAddMaterial(true)} className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-3 flex items-center gap-3">
-              <Plus className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-primary">Add Material (PDF/Notes)</span>
-            </button>
+            {/* State & Subject filters */}
+            <div className="flex gap-2">
+              <select value={matFilterState} onChange={e => { setMatFilterState(e.target.value); setSelectedFolder(null); }} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All States</option>
+                <option value="ap">AP</option>
+                <option value="ts">TS</option>
+                <option value="both">Both</option>
+              </select>
+              <select value={matFilterSubject} onChange={e => { setMatFilterSubject(e.target.value); setSelectedFolder(null); }} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All Subjects</option>
+                {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
 
-            {materialsLoading ? <div className="flex justify-center py-12"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div> :
-            filteredMaterials.length === 0 ? <p className="text-center text-muted-foreground text-sm py-8">No materials yet</p> :
-            filteredMaterials.map(m => (
-              <div key={m.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${m.is_published ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
-                      {m.is_published ? "Live" : "Hidden"}
-                    </span>
-                    <h3 className="font-heading font-semibold text-sm text-foreground mt-1 truncate">{m.title}</h3>
-                    <p className="text-xs text-muted-foreground">{m.subjects?.name} · {m.file_type?.toUpperCase()}</p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => toggleMaterialPublish(m)} className="p-2 rounded-xl hover:bg-muted">
-                      {m.is_published ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-primary" />}
-                    </button>
-                    <button onClick={() => deleteMaterial(m.id)} className="p-2 rounded-xl hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-destructive" /></button>
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <button onClick={() => setShowCreateFolder(true)} className="flex-1 bg-primary/10 border border-primary/20 rounded-2xl p-3 flex items-center justify-center gap-2">
+                <FolderPlus className="h-5 w-5 text-primary" />
+                <span className="text-sm font-semibold text-primary">New Folder</span>
+              </button>
+            </div>
+
+            {selectedFolder ? (
+              /* ── Inside a folder ── */
+              <div className="space-y-3">
+                <button onClick={() => setSelectedFolder(null)} className="inline-flex items-center gap-2 text-primary text-sm font-semibold">
+                  <ArrowLeft className="h-4 w-4" /> Back to Folders
+                </button>
+                <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
+                  <div className="flex items-center gap-3">
+                    <FolderOpen className="h-6 w-6 text-primary" />
+                    <div>
+                      <h3 className="font-heading font-semibold text-foreground">{selectedFolder.name}</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {subjects.find(s => s.id === selectedFolder.subject_id)?.name} · {selectedFolder.state.toUpperCase()} · {folderMaterials.length} files
+                      </p>
+                    </div>
                   </div>
                 </div>
+
+                <button onClick={() => setShowAddMaterial(true)} className="w-full bg-accent/10 border border-accent/20 rounded-2xl p-3 flex items-center gap-3">
+                  <Upload className="h-5 w-5 text-accent" />
+                  <span className="text-sm font-semibold text-accent">Upload Files to this Folder</span>
+                </button>
+
+                {materialsLoading ? <div className="flex justify-center py-8"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div> :
+                folderMaterials.length === 0 ? <p className="text-center text-muted-foreground text-sm py-6">No files in this folder</p> :
+                folderMaterials.map(m => (
+                  <div key={m.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${m.is_published ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
+                          {m.is_published ? "Live" : "Hidden"}
+                        </span>
+                        <h3 className="font-heading font-semibold text-sm text-foreground mt-1 truncate">{m.title}</h3>
+                        <p className="text-xs text-muted-foreground">{m.file_type?.toUpperCase()}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => toggleMaterialPublish(m)} className="p-2 rounded-xl hover:bg-muted">
+                          {m.is_published ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-primary" />}
+                        </button>
+                        <button onClick={() => deleteMaterial(m.id)} className="p-2 rounded-xl hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-destructive" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              /* ── Folder list ── */
+              <div className="space-y-2">
+                {foldersLoading ? <div className="flex justify-center py-12"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div> :
+                filteredFolders.length === 0 ? <p className="text-center text-muted-foreground text-sm py-8">No folders yet. Create one first!</p> :
+                filteredFolders.map(f => {
+                  const count = materials.filter(m => m.folder_id === f.id).length;
+                  return (
+                    <div key={f.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50 flex items-center gap-3">
+                      <button onClick={() => setSelectedFolder(f)} className="flex-1 flex items-center gap-3 text-left">
+                        <Folder className="h-6 w-6 text-primary shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-heading font-semibold text-sm text-foreground truncate">{f.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {subjects.find(s => s.id === f.subject_id)?.name} · {f.state.toUpperCase()} · {count} files
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                      </button>
+                      <button onClick={() => setDeleteFolderTarget(f)} className="p-2 rounded-xl hover:bg-destructive/10 shrink-0">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -457,21 +609,40 @@ export default function AdminDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* ═══ ADD MATERIAL DIALOG ═══ */}
-      <Dialog open={showAddMaterial} onOpenChange={setShowAddMaterial}>
+      {/* ═══ CREATE FOLDER DIALOG ═══ */}
+      <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Add Material</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Create Folder</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <select value={matSubject} onChange={e => setMatSubject(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
-              <option value="">Select Subject</option>
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-            <select value={matState} onChange={e => setMatState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+            <label className="text-sm font-semibold text-foreground">1. Select State</label>
+            <select value={newFolderState} onChange={e => setNewFolderState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
               <option value="both">Both States</option>
               <option value="ap">AP Only</option>
               <option value="ts">TS Only</option>
             </select>
-            <Input placeholder="Material Title" value={matTitle} onChange={e => setMatTitle(e.target.value)} className="rounded-xl" />
+            <label className="text-sm font-semibold text-foreground">2. Select Subject</label>
+            <select value={newFolderSubject} onChange={e => setNewFolderSubject(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+              <option value="">Select Subject</option>
+              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <label className="text-sm font-semibold text-foreground">3. Folder Name</label>
+            <Input placeholder="e.g., Chapter 1 Notes" value={newFolderName} onChange={e => setNewFolderName(e.target.value)} className="rounded-xl" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreateFolder(false)}>Cancel</Button>
+            <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || !newFolderSubject || creatingFolder}>
+              {creatingFolder ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <FolderPlus className="h-4 w-4 mr-1" />}Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ UPLOAD FILES TO FOLDER DIALOG ═══ */}
+      <Dialog open={showAddMaterial} onOpenChange={setShowAddMaterial}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Upload to "{selectedFolder?.name}"</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Input placeholder="Title (optional, defaults to filename)" value={matTitle} onChange={e => setMatTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={matDesc} onChange={e => setMatDesc(e.target.value)} className="rounded-xl" />
             <div onClick={() => matFileRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
               <BookOpen className="h-8 w-8 text-primary mx-auto mb-1" />
@@ -482,7 +653,7 @@ export default function AdminDashboard() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddMaterial(false)}>Cancel</Button>
-            <Button onClick={handleAddMaterial} disabled={!matTitle.trim() || !matSubject || matFiles.length === 0 || matUploading}>
+            <Button onClick={handleAddMaterial} disabled={matFiles.length === 0 || matUploading}>
               {matUploading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Upload {matFiles.length > 1 ? `(${matFiles.length})` : ""}
             </Button>
           </DialogFooter>
@@ -528,6 +699,24 @@ export default function AdminDashboard() {
             <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteExam} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ═══ DELETE FOLDER DIALOG ═══ */}
+      <AlertDialog open={!!deleteFolderTarget} onOpenChange={o => !o && setDeleteFolderTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Folder?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{deleteFolderTarget?.name}" and all files inside will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingFolder}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteFolder} disabled={deletingFolder} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deletingFolder ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

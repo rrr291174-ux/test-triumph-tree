@@ -209,6 +209,41 @@ export type Database = {
           },
         ]
       }
+      folders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          state: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          state?: string
+          subject_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          state?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       materials: {
         Row: {
           created_at: string
@@ -216,6 +251,7 @@ export type Database = {
           description: string | null
           file_type: string | null
           file_url: string | null
+          folder_id: string | null
           id: string
           is_published: boolean | null
           state: string | null
@@ -229,6 +265,7 @@ export type Database = {
           description?: string | null
           file_type?: string | null
           file_url?: string | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -242,6 +279,7 @@ export type Database = {
           description?: string | null
           file_type?: string | null
           file_url?: string | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -250,6 +288,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "materials_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "materials_subject_id_fkey"
             columns: ["subject_id"]
