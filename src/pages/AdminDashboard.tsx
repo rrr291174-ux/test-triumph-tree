@@ -20,7 +20,7 @@ import {
 
 interface SubjectOption { id: string; name: string; slug: string; }
 interface Exam {
-  id: string; title: string; subject_id: string;
+  id: string; title: string; subject_id: string; state: string;
   duration_minutes: number | null; total_marks: number | null;
   is_published: boolean | null; created_at: string;
   subjects?: { name: string; slug: string } | null;
@@ -64,12 +64,17 @@ export default function AdminDashboard() {
   // ─── Upload state ───
   const [showUpload, setShowUpload] = useState(false);
   const [uploadSubject, setUploadSubject] = useState("");
+  const [uploadState, setUploadState] = useState("both");
   const [uploadTitle, setUploadTitle] = useState("");
   const [uploadDuration, setUploadDuration] = useState(30);
   const [jsonData, setJsonData] = useState<QuestionJSON[] | null>(null);
   const [uploadFileName, setUploadFileName] = useState("");
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // ─── Exam filters ───
+  const [examFilterState, setExamFilterState] = useState("");
+  const [examFilterSubject, setExamFilterSubject] = useState("");
 
   // ─── Material / Folder state ───
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -123,7 +128,7 @@ export default function AdminDashboard() {
     setExamsLoading(true);
     const { data } = await supabase
       .from("exams")
-      .select("id, title, subject_id, duration_minutes, total_marks, is_published, created_at, subjects(name, slug)")
+      .select("id, title, subject_id, state, duration_minutes, total_marks, is_published, created_at, subjects(name, slug)")
       .order("created_at", { ascending: false });
     setExams((data as Exam[]) || []);
     setExamsLoading(false);
@@ -234,7 +239,7 @@ export default function AdminDashboard() {
     if (!jsonData || !uploadSubject || !uploadTitle.trim()) return;
     setUploading(true);
     try {
-      const { data: exam, error } = await supabase.from("exams").insert({ subject_id: uploadSubject, title: uploadTitle.trim(), duration_minutes: uploadDuration, total_marks: jsonData.length, created_by: user!.id, is_published: false }).select("id").single();
+      const { data: exam, error } = await supabase.from("exams").insert({ subject_id: uploadSubject, title: uploadTitle.trim(), duration_minutes: uploadDuration, total_marks: jsonData.length, created_by: user!.id, is_published: false, state: uploadState }).select("id").single();
       if (error) throw error;
       const BATCH = 100;
       for (let i = 0; i < jsonData.length; i += BATCH) {
@@ -242,7 +247,7 @@ export default function AdminDashboard() {
         await supabase.from("questions").insert(batch);
       }
       toast({ title: `🎉 ${jsonData.length} questions uploaded!` });
-      setShowUpload(false); setJsonData(null); setUploadFileName(""); setUploadTitle(""); setUploadSubject("");
+      setShowUpload(false); setJsonData(null); setUploadFileName(""); setUploadTitle(""); setUploadSubject(""); setUploadState("both");
       if (fileRef.current) fileRef.current.value = "";
       fetchExams();
     } catch (err: any) {
@@ -361,7 +366,12 @@ export default function AdminDashboard() {
     { id: "classes", label: "Classes", icon: Video, count: classes.length },
   ];
 
-  const filteredExams = exams.filter(e => e.title.toLowerCase().includes(search.toLowerCase()));
+  const filteredExams = exams.filter(e => {
+    if (examFilterState && e.state !== examFilterState && e.state !== "both") return false;
+    if (examFilterSubject && e.subject_id !== examFilterSubject) return false;
+    if (search && !e.title.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
   const filteredClasses = classes.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
   // Filtered folders by state & subject
@@ -421,6 +431,20 @@ export default function AdminDashboard() {
         {/* ═══ EXAMS TAB ═══ */}
         {tab === "exams" && (
           <div className="space-y-3">
+            {/* State & Subject filters */}
+            <div className="flex gap-2">
+              <select value={examFilterState} onChange={e => setExamFilterState(e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All States</option>
+                <option value="ap">AP</option>
+                <option value="ts">TS</option>
+                <option value="both">Both</option>
+              </select>
+              <select value={examFilterSubject} onChange={e => setExamFilterSubject(e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All Subjects</option>
+                {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+
             <button onClick={() => setShowUpload(true)} className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-3 flex items-center gap-3">
               <Upload className="h-5 w-5 text-primary" />
               <span className="text-sm font-semibold text-primary">Upload New Exam (JSON)</span>
@@ -432,9 +456,14 @@ export default function AdminDashboard() {
               <div key={exam.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${exam.is_published ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
-                      {exam.is_published ? <><CheckCircle className="h-3 w-3" /> Live</> : <><XCircle className="h-3 w-3" /> Hidden</>}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${exam.is_published ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"}`}>
+                        {exam.is_published ? <><CheckCircle className="h-3 w-3" /> Live</> : <><XCircle className="h-3 w-3" /> Hidden</>}
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-bold uppercase">
+                        {exam.state || "both"}
+                      </span>
+                    </div>
                     <h3 className="font-heading font-semibold text-sm text-foreground mt-1 truncate">{exam.title}</h3>
                     <p className="text-xs text-muted-foreground">{exam.subjects?.name} · {exam.total_marks ?? 0}Q · {exam.duration_minutes ?? 30}min</p>
                   </div>
@@ -587,12 +616,21 @@ export default function AdminDashboard() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Upload Exam (JSON)</DialogTitle></DialogHeader>
           <div className="space-y-3">
+            <label className="text-sm font-semibold text-foreground">1. Select State</label>
+            <select value={uploadState} onChange={e => setUploadState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
+              <option value="both">Both States</option>
+              <option value="ap">AP Only</option>
+              <option value="ts">TS Only</option>
+            </select>
+            <label className="text-sm font-semibold text-foreground">2. Select Subject</label>
             <select value={uploadSubject} onChange={e => setUploadSubject(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
               <option value="">Select Subject</option>
               {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            <label className="text-sm font-semibold text-foreground">3. Exam Details</label>
             <Input placeholder="Exam Title" value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} className="rounded-xl" />
             <Input type="number" placeholder="Duration (min)" value={uploadDuration} onChange={e => setUploadDuration(Number(e.target.value))} min={5} max={180} className="rounded-xl" />
+            <label className="text-sm font-semibold text-foreground">4. Upload JSON</label>
             <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
               <FileJson className="h-8 w-8 text-primary mx-auto mb-1" />
               <p className="text-sm font-semibold">{uploadFileName || "Select JSON file"}</p>
