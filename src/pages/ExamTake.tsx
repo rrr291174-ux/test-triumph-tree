@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Clock, BookOpen, CheckCircle, X } from "lucide-react";
+import { Loader2, Clock, BookOpen, CheckCircle, X, AlertTriangle } from "lucide-react";
+import ObjectionModal from "@/components/ObjectionModal";
 
 interface Question {
   id: string;
@@ -60,6 +61,7 @@ export default function ExamTake() {
   const [startTime] = useState(Date.now());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [objectionOpen, setObjectionOpen] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -258,6 +260,14 @@ export default function ExamTake() {
           </p>
         </div>
 
+        {/* Objection button */}
+        <button
+          onClick={() => setObjectionOpen(true)}
+          className="flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-full mb-4 hover:bg-orange-100 transition-all active:scale-95"
+        >
+          <AlertTriangle className="h-3.5 w-3.5" /> Raise Objection
+        </button>
+
         {/* Options — (a) (b) (c) (d) style */}
         <div className="space-y-3">
         {q.options.map((opt, i) => {
@@ -410,6 +420,16 @@ export default function ExamTake() {
       </div>
 
       {/* ── SUBMIT CONFIRMATION ── */}
+      {/* Objection Modal */}
+      <ObjectionModal
+        open={objectionOpen}
+        onClose={() => setObjectionOpen(false)}
+        questionId={q.id}
+        examId={examId!}
+        questionNumber={currentQ + 1}
+        questionText={q.question_text}
+      />
+
       {showSubmitConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-card rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-border/50">
