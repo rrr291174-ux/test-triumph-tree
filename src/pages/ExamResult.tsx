@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Loader2, CheckCircle, XCircle, Minus, Trophy, Target,
-  Clock, BookOpen, Star, ChevronDown, ChevronUp, Home, RotateCcw
+  Clock, BookOpen, Star, ChevronDown, ChevronUp, Home, RotateCcw, AlertTriangle
 } from "lucide-react";
+import ObjectionModal from "@/components/ObjectionModal";
 
 interface AttemptData {
   id: string;
@@ -56,6 +57,7 @@ export default function ExamResult() {
   const [examId, setExamId] = useState("");
   const [loading, setLoading] = useState(true);
   const [expandedQ, setExpandedQ] = useState<string | null>(null);
+  const [objection, setObjection] = useState<{ questionId: string; questionNumber: number; questionText: string } | null>(null);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -326,12 +328,32 @@ export default function ExamResult() {
                       <p className="text-sm text-violet-800 leading-relaxed">{a.question.explanation}</p>
                     </div>
                   )}
+
+                  {/* Objection button */}
+                  <button
+                    onClick={() => setObjection({ questionId: a.question_id, questionNumber: i + 1, questionText: a.question.question_text })}
+                    className="mt-2 flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-full hover:bg-orange-100 transition-all active:scale-95"
+                  >
+                    <AlertTriangle className="h-3.5 w-3.5" /> Raise Objection
+                  </button>
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Objection Modal */}
+      {objection && (
+        <ObjectionModal
+          open={!!objection}
+          onClose={() => setObjection(null)}
+          questionId={objection.questionId}
+          examId={examId}
+          questionNumber={objection.questionNumber}
+          questionText={objection.questionText}
+        />
+      )}
 
       {/* ── BOTTOM ACTIONS ── */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border px-4 py-3 shadow-lg">

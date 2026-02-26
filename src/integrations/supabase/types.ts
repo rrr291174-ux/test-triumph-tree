@@ -304,6 +304,57 @@ export type Database = {
           },
         ]
       }
+      objections: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          exam_id: string
+          id: string
+          question_id: string
+          reason: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          exam_id: string
+          id?: string
+          question_id: string
+          reason: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          exam_id?: string
+          id?: string
+          question_id?: string
+          reason?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objections_exam_id_fkey"
+            columns: ["exam_id"]
+            isOneToOne: false
+            referencedRelation: "exams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "objections_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
