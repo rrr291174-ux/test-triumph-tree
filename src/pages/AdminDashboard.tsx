@@ -395,10 +395,61 @@ export default function AdminDashboard() {
     toast({ title: "🗑️ Class deleted" });
   };
 
+  // ─── Objection handlers ───
+  const handleRespondObjection = async () => {
+    if (!respondTarget) return;
+    setResponding(true);
+    await supabase.from("objections").update({
+      status: respondStatus,
+      admin_response: adminResponse.trim() || null,
+    }).eq("id", respondTarget.id);
+    setObjections(p => p.map(o => o.id === respondTarget.id ? { ...o, status: respondStatus, admin_response: adminResponse.trim() || null } : o));
+    setRespondTarget(null);
+    setAdminResponse("");
+    setResponding(false);
+    toast({ title: respondStatus === "accepted" ? "✅ Objection Accepted" : "❌ Objection Rejected" });
+  };
+
+  const handleDeleteObjection = async (id: string) => {
+    await supabase.from("objections").delete().eq("id", id);
+    setObjections(p => p.filter(o => o.id !== id));
+    toast({ title: "🗑️ Objection deleted" });
+  };
+
+  // ─── Download Exam JSON ───
+  const handleDownloadExamJson = async (examId: string, examTitle: string) => {
+    const { data } = await supabase
+      .from("questions")
+      .select("question_text, options, answer_index, display_order, explanation")
+      .eq("exam_id", examId)
+      .order("display_order");
+    if (!data || data.length === 0) {
+      toast({ title: "No questions found", variant: "destructive" });
+      return;
+    }
+    const jsonContent = data.map(q => ({
+      question: q.question_text,
+      options: q.options,
+      answer_index: q.answer_index,
+      explanation: q.explanation || undefined,
+    }));
+    const blob = new Blob([JSON.stringify(jsonContent, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${examTitle.replace(/[^a-zA-Z0-9]/g, "_")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "📥 JSON downloaded" });
+  };
+
+  const pendingObjCount = objections.filter(o => o.status === "pending").length;
+
   const tabs: { id: Tab; label: string; icon: typeof FileText; count: number }[] = [
     { id: "exams", label: "Exams", icon: FileText, count: exams.length },
     { id: "material", label: "Material", icon: BookOpen, count: materials.length },
     { id: "classes", label: "Classes", icon: Video, count: classes.length },
+    { id: "objections", label: "Objections", icon: AlertTriangle, count: pendingObjCount },
   ];
 
   const filteredExams = exams.filter(e => {
