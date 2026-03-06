@@ -702,6 +702,68 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
+
+        {/* ═══ OBJECTIONS TAB ═══ */}
+        {tab === "objections" && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <select value={objFilterStatus} onChange={e => setObjFilterStatus(e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            {objectionsLoading ? <div className="flex justify-center py-12"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div> :
+            filteredObjections.length === 0 ? <p className="text-center text-muted-foreground text-sm py-8">No objections found</p> :
+            filteredObjections.map(obj => (
+              <div key={obj.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        obj.status === "accepted" ? "bg-green-100 text-green-700" :
+                        obj.status === "rejected" ? "bg-red-100 text-red-700" :
+                        "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {obj.status === "accepted" ? "✓ Accepted" : obj.status === "rejected" ? "✗ Rejected" : "⏳ Pending"}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">{new Date(obj.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Exam: <strong>{obj.exams?.title || "Unknown"}</strong></p>
+                    {obj.questions && (
+                      <p className="text-xs text-muted-foreground line-clamp-1">Q{obj.questions.display_order}: {obj.questions.question_text}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => { setRespondTarget(obj); setAdminResponse(obj.admin_response || ""); setRespondStatus(obj.status === "rejected" ? "rejected" : "accepted"); }} className="p-2 rounded-xl hover:bg-muted" title="Respond">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                    </button>
+                    <button onClick={() => handleDeleteObjection(obj.id)} className="p-2 rounded-xl hover:bg-destructive/10" title="Delete">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5">
+                  <p className="text-xs font-bold text-orange-600 mb-0.5">User's Objection</p>
+                  <p className="text-sm text-orange-800">{obj.reason}</p>
+                </div>
+                {obj.image_url && (
+                  <a href={obj.image_url} target="_blank" rel="noopener noreferrer">
+                    <img src={obj.image_url} alt="Attachment" className="rounded-xl w-full max-h-40 object-cover border border-border" />
+                  </a>
+                )}
+                {obj.admin_response && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5">
+                    <p className="text-xs font-bold text-blue-600 mb-0.5">Admin Response</p>
+                    <p className="text-sm text-blue-800">{obj.admin_response}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ═══ UPLOAD EXAM DIALOG ═══ */}
