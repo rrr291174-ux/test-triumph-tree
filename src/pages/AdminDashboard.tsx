@@ -5,7 +5,8 @@ import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, AlertCircle, Pencil, Trash2, Eye, EyeOff,
   CheckCircle, XCircle, Search, Upload, FileJson, BookOpen, Video,
-  FileText, Plus, Link as LinkIcon, X, FolderPlus, Folder, FolderOpen, ChevronRight
+  FileText, Plus, Link as LinkIcon, X, FolderPlus, Folder, FolderOpen, ChevronRight,
+  AlertTriangle, Download, MessageSquare, Send, Image as ImageIcon
 } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,21 @@ interface FolderItem {
   id: string; name: string; subject_id: string; state: string; created_at: string;
 }
 
-type Tab = "exams" | "material" | "classes";
+interface ObjectionItem {
+  id: string;
+  user_id: string;
+  question_id: string;
+  exam_id: string;
+  reason: string;
+  status: string;
+  admin_response: string | null;
+  image_url: string | null;
+  created_at: string;
+  questions?: { question_text: string; options: any; answer_index: number; display_order: number | null } | null;
+  exams?: { title: string } | null;
+}
+
+type Tab = "exams" | "material" | "classes" | "objections";
 
 interface QuestionJSON { question: string; options: string[]; answer_index: number; }
 
@@ -116,6 +131,15 @@ export default function AdminDashboard() {
   const [classDuration, setClassDuration] = useState(60);
   const [classAdding, setClassAdding] = useState(false);
 
+  // ─── Objections state ───
+  const [objections, setObjections] = useState<ObjectionItem[]>([]);
+  const [objectionsLoading, setObjectionsLoading] = useState(true);
+  const [objFilterStatus, setObjFilterStatus] = useState("");
+  const [respondTarget, setRespondTarget] = useState<ObjectionItem | null>(null);
+  const [adminResponse, setAdminResponse] = useState("");
+  const [respondStatus, setRespondStatus] = useState<"accepted" | "rejected">("accepted");
+  const [responding, setResponding] = useState(false);
+
   // Load subjects
   useEffect(() => {
     supabase.from("subjects").select("id, name, slug").order("display_order").then(({ data }) => {
@@ -167,8 +191,19 @@ export default function AdminDashboard() {
     setClassesLoading(false);
   };
 
+  // Load objections
+  const fetchObjections = async () => {
+    setObjectionsLoading(true);
+    const { data } = await supabase
+      .from("objections")
+      .select("id, user_id, question_id, exam_id, reason, status, admin_response, image_url, created_at, questions(question_text, options, answer_index, display_order), exams(title)")
+      .order("created_at", { ascending: false });
+    setObjections((data as unknown as ObjectionItem[]) || []);
+    setObjectionsLoading(false);
+  };
+
   useEffect(() => {
-    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); }
+    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); fetchObjections(); }
   }, [isAdmin]);
 
   // Auth guards
@@ -360,10 +395,61 @@ export default function AdminDashboard() {
     toast({ title: "🗑️ Class deleted" });
   };
 
+  // ─── Objection handlers ───
+  const handleRespondObjection = async () => {
+    if (!respondTarget) return;
+    setResponding(true);
+    await supabase.from("objections").update({
+      status: respondStatus,
+      admin_response: adminResponse.trim() || null,
+    }).eq("id", respondTarget.id);
+    setObjections(p => p.map(o => o.id === respondTarget.id ? { ...o, status: respondStatus, admin_response: adminResponse.trim() || null } : o));
+    setRespondTarget(null);
+    setAdminResponse("");
+    setResponding(false);
+    toast({ title: respondStatus === "accepted" ? "✅ Objection Accepted" : "❌ Objection Rejected" });
+  };
+
+  const handleDeleteObjection = async (id: string) => {
+    await supabase.from("objections").delete().eq("id", id);
+    setObjections(p => p.filter(o => o.id !== id));
+    toast({ title: "🗑️ Objection deleted" });
+  };
+
+  // ─── Download Exam JSON ───
+  const handleDownloadExamJson = async (examId: string, examTitle: string) => {
+    const { data } = await supabase
+      .from("questions")
+      .select("question_text, options, answer_index, display_order, explanation")
+      .eq("exam_id", examId)
+      .order("display_order");
+    if (!data || data.length === 0) {
+      toast({ title: "No questions found", variant: "destructive" });
+      return;
+    }
+    const jsonContent = data.map(q => ({
+      question: q.question_text,
+      options: q.options,
+      answer_index: q.answer_index,
+      explanation: q.explanation || undefined,
+    }));
+    const blob = new Blob([JSON.stringify(jsonContent, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${examTitle.replace(/[^a-zA-Z0-9]/g, "_")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "📥 JSON downloaded" });
+  };
+
+  const pendingObjCount = objections.filter(o => o.status === "pending").length;
+
   const tabs: { id: Tab; label: string; icon: typeof FileText; count: number }[] = [
     { id: "exams", label: "Exams", icon: FileText, count: exams.length },
     { id: "material", label: "Material", icon: BookOpen, count: materials.length },
     { id: "classes", label: "Classes", icon: Video, count: classes.length },
+    { id: "objections", label: "Objections", icon: AlertTriangle, count: pendingObjCount },
   ];
 
   const filteredExams = exams.filter(e => {
@@ -373,6 +459,12 @@ export default function AdminDashboard() {
     return true;
   });
   const filteredClasses = classes.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
+
+  const filteredObjections = objections.filter(o => {
+    if (objFilterStatus && o.status !== objFilterStatus) return false;
+    if (search && !o.reason.toLowerCase().includes(search.toLowerCase()) && !o.exams?.title?.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   // Filtered folders by state & subject
   const filteredFolders = folders.filter(f => {
@@ -468,6 +560,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-muted-foreground">{exam.subjects?.name} · {exam.total_marks ?? 0}Q · {exam.duration_minutes ?? 30}min</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => handleDownloadExamJson(exam.id, exam.title)} title="Download JSON" className="p-2 rounded-xl hover:bg-muted"><Download className="h-4 w-4 text-muted-foreground" /></button>
                     <button onClick={() => handleTogglePublish(exam)} className="p-2 rounded-xl hover:bg-muted"><Eye className="h-4 w-4 text-muted-foreground" /></button>
                     <button onClick={() => { setEditTarget(exam); setEditTitle(exam.title); setEditDuration(exam.duration_minutes ?? 30); setEditSubject(exam.subject_id); }} className="p-2 rounded-xl hover:bg-muted"><Pencil className="h-4 w-4" /></button>
                     <button onClick={() => setDeleteTarget(exam)} className="p-2 rounded-xl hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-destructive" /></button>
@@ -605,6 +698,68 @@ export default function AdminDashboard() {
                     <button onClick={() => deleteClass(c.id)} className="p-2 rounded-xl hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-destructive" /></button>
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ═══ OBJECTIONS TAB ═══ */}
+        {tab === "objections" && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <select value={objFilterStatus} onChange={e => setObjFilterStatus(e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-sm">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            {objectionsLoading ? <div className="flex justify-center py-12"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div> :
+            filteredObjections.length === 0 ? <p className="text-center text-muted-foreground text-sm py-8">No objections found</p> :
+            filteredObjections.map(obj => (
+              <div key={obj.id} className="bg-card rounded-2xl p-4 shadow-card border border-border/50 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                        obj.status === "accepted" ? "bg-green-100 text-green-700" :
+                        obj.status === "rejected" ? "bg-red-100 text-red-700" :
+                        "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        {obj.status === "accepted" ? "✓ Accepted" : obj.status === "rejected" ? "✗ Rejected" : "⏳ Pending"}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">{new Date(obj.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Exam: <strong>{obj.exams?.title || "Unknown"}</strong></p>
+                    {obj.questions && (
+                      <p className="text-xs text-muted-foreground line-clamp-1">Q{obj.questions.display_order}: {obj.questions.question_text}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => { setRespondTarget(obj); setAdminResponse(obj.admin_response || ""); setRespondStatus(obj.status === "rejected" ? "rejected" : "accepted"); }} className="p-2 rounded-xl hover:bg-muted" title="Respond">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                    </button>
+                    <button onClick={() => handleDeleteObjection(obj.id)} className="p-2 rounded-xl hover:bg-destructive/10" title="Delete">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5">
+                  <p className="text-xs font-bold text-orange-600 mb-0.5">User's Objection</p>
+                  <p className="text-sm text-orange-800">{obj.reason}</p>
+                </div>
+                {obj.image_url && (
+                  <a href={obj.image_url} target="_blank" rel="noopener noreferrer">
+                    <img src={obj.image_url} alt="Attachment" className="rounded-xl w-full max-h-40 object-cover border border-border" />
+                  </a>
+                )}
+                {obj.admin_response && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5">
+                    <p className="text-xs font-bold text-blue-600 mb-0.5">Admin Response</p>
+                    <p className="text-sm text-blue-800">{obj.admin_response}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -775,6 +930,58 @@ export default function AdminDashboard() {
             <Button variant="outline" onClick={() => setEditTarget(null)}>Cancel</Button>
             <Button onClick={handleSaveEdit} disabled={saving || !editTitle.trim()}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══ RESPOND TO OBJECTION DIALOG ═══ */}
+      <Dialog open={!!respondTarget} onOpenChange={o => { if (!o) setRespondTarget(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Respond to Objection</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            {respondTarget?.questions && (
+              <div className="bg-muted rounded-xl p-2.5">
+                <p className="text-xs font-bold text-muted-foreground mb-0.5">Question</p>
+                <p className="text-sm text-foreground line-clamp-3">{respondTarget.questions.question_text}</p>
+              </div>
+            )}
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5">
+              <p className="text-xs font-bold text-orange-600 mb-0.5">User's Objection</p>
+              <p className="text-sm text-orange-800">{respondTarget?.reason}</p>
+            </div>
+            {respondTarget?.image_url && (
+              <a href={respondTarget.image_url} target="_blank" rel="noopener noreferrer">
+                <img src={respondTarget.image_url} alt="Attachment" className="rounded-xl w-full max-h-32 object-cover border border-border" />
+              </a>
+            )}
+            <label className="text-sm font-semibold text-foreground">Decision</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRespondStatus("accepted")}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all ${respondStatus === "accepted" ? "border-green-500 bg-green-50 text-green-700" : "border-border text-muted-foreground"}`}
+              >
+                ✓ Accept
+              </button>
+              <button
+                onClick={() => setRespondStatus("rejected")}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all ${respondStatus === "rejected" ? "border-red-500 bg-red-50 text-red-700" : "border-border text-muted-foreground"}`}
+              >
+                ✗ Reject
+              </button>
+            </div>
+            <label className="text-sm font-semibold text-foreground">Response (optional)</label>
+            <textarea
+              value={adminResponse}
+              onChange={e => setAdminResponse(e.target.value)}
+              placeholder="Write your response to the student..."
+              className="w-full h-24 rounded-xl border-2 border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRespondTarget(null)}>Cancel</Button>
+            <Button onClick={handleRespondObjection} disabled={responding}>
+              {responding ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}Save
             </Button>
           </DialogFooter>
         </DialogContent>
