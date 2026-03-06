@@ -191,8 +191,19 @@ export default function AdminDashboard() {
     setClassesLoading(false);
   };
 
+  // Load objections
+  const fetchObjections = async () => {
+    setObjectionsLoading(true);
+    const { data } = await supabase
+      .from("objections")
+      .select("id, user_id, question_id, exam_id, reason, status, admin_response, image_url, created_at, questions(question_text, options, answer_index, display_order), exams(title)")
+      .order("created_at", { ascending: false });
+    setObjections((data as unknown as ObjectionItem[]) || []);
+    setObjectionsLoading(false);
+  };
+
   useEffect(() => {
-    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); }
+    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); fetchObjections(); }
   }, [isAdmin]);
 
   // Auth guards
