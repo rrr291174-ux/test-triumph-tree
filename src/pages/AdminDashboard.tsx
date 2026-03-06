@@ -5,7 +5,8 @@ import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Loader2, AlertCircle, Pencil, Trash2, Eye, EyeOff,
   CheckCircle, XCircle, Search, Upload, FileJson, BookOpen, Video,
-  FileText, Plus, Link as LinkIcon, X, FolderPlus, Folder, FolderOpen, ChevronRight
+  FileText, Plus, Link as LinkIcon, X, FolderPlus, Folder, FolderOpen, ChevronRight,
+  AlertTriangle, Download, MessageSquare, Send, Image as ImageIcon
 } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
