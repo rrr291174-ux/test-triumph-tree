@@ -460,6 +460,12 @@ export default function AdminDashboard() {
   });
   const filteredClasses = classes.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
+  const filteredObjections = objections.filter(o => {
+    if (objFilterStatus && o.status !== objFilterStatus) return false;
+    if (search && !o.reason.toLowerCase().includes(search.toLowerCase()) && !o.exams?.title?.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
   // Filtered folders by state & subject
   const filteredFolders = folders.filter(f => {
     if (matFilterState && f.state !== matFilterState && f.state !== "both") return false;
