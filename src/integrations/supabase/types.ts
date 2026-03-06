@@ -310,6 +310,7 @@ export type Database = {
           created_at: string
           exam_id: string
           id: string
+          image_url: string | null
           question_id: string
           reason: string
           status: string
@@ -321,6 +322,7 @@ export type Database = {
           created_at?: string
           exam_id: string
           id?: string
+          image_url?: string | null
           question_id: string
           reason: string
           status?: string
@@ -332,6 +334,7 @@ export type Database = {
           created_at?: string
           exam_id?: string
           id?: string
+          image_url?: string | null
           question_id?: string
           reason?: string
           status?: string

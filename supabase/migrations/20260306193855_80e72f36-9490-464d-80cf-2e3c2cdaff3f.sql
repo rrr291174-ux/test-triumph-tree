@@ -1,0 +1,1 @@
+ALTER TABLE public.objections ADD COLUMN image_url TEXT DEFAULT NULL;
