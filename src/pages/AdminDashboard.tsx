@@ -934,6 +934,58 @@ export default function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ═══ RESPOND TO OBJECTION DIALOG ═══ */}
+      <Dialog open={!!respondTarget} onOpenChange={o => { if (!o) setRespondTarget(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Respond to Objection</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            {respondTarget?.questions && (
+              <div className="bg-muted rounded-xl p-2.5">
+                <p className="text-xs font-bold text-muted-foreground mb-0.5">Question</p>
+                <p className="text-sm text-foreground line-clamp-3">{respondTarget.questions.question_text}</p>
+              </div>
+            )}
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5">
+              <p className="text-xs font-bold text-orange-600 mb-0.5">User's Objection</p>
+              <p className="text-sm text-orange-800">{respondTarget?.reason}</p>
+            </div>
+            {respondTarget?.image_url && (
+              <a href={respondTarget.image_url} target="_blank" rel="noopener noreferrer">
+                <img src={respondTarget.image_url} alt="Attachment" className="rounded-xl w-full max-h-32 object-cover border border-border" />
+              </a>
+            )}
+            <label className="text-sm font-semibold text-foreground">Decision</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRespondStatus("accepted")}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all ${respondStatus === "accepted" ? "border-green-500 bg-green-50 text-green-700" : "border-border text-muted-foreground"}`}
+              >
+                ✓ Accept
+              </button>
+              <button
+                onClick={() => setRespondStatus("rejected")}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all ${respondStatus === "rejected" ? "border-red-500 bg-red-50 text-red-700" : "border-border text-muted-foreground"}`}
+              >
+                ✗ Reject
+              </button>
+            </div>
+            <label className="text-sm font-semibold text-foreground">Response (optional)</label>
+            <textarea
+              value={adminResponse}
+              onChange={e => setAdminResponse(e.target.value)}
+              placeholder="Write your response to the student..."
+              className="w-full h-24 rounded-xl border-2 border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRespondTarget(null)}>Cancel</Button>
+            <Button onClick={handleRespondObjection} disabled={responding}>
+              {responding ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
