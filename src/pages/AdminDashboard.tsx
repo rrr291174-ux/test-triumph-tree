@@ -40,7 +40,21 @@ interface FolderItem {
   id: string; name: string; subject_id: string; state: string; created_at: string;
 }
 
-type Tab = "exams" | "material" | "classes";
+interface ObjectionItem {
+  id: string;
+  user_id: string;
+  question_id: string;
+  exam_id: string;
+  reason: string;
+  status: string;
+  admin_response: string | null;
+  image_url: string | null;
+  created_at: string;
+  questions?: { question_text: string; options: any; answer_index: number; display_order: number | null } | null;
+  exams?: { title: string } | null;
+}
+
+type Tab = "exams" | "material" | "classes" | "objections";
 
 interface QuestionJSON { question: string; options: string[]; answer_index: number; }
 
