@@ -131,6 +131,15 @@ export default function AdminDashboard() {
   const [classDuration, setClassDuration] = useState(60);
   const [classAdding, setClassAdding] = useState(false);
 
+  // ─── Objections state ───
+  const [objections, setObjections] = useState<ObjectionItem[]>([]);
+  const [objectionsLoading, setObjectionsLoading] = useState(true);
+  const [objFilterStatus, setObjFilterStatus] = useState("");
+  const [respondTarget, setRespondTarget] = useState<ObjectionItem | null>(null);
+  const [adminResponse, setAdminResponse] = useState("");
+  const [respondStatus, setRespondStatus] = useState<"accepted" | "rejected">("accepted");
+  const [responding, setResponding] = useState(false);
+
   // Load subjects
   useEffect(() => {
     supabase.from("subjects").select("id, name, slug").order("display_order").then(({ data }) => {
