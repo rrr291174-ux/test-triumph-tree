@@ -560,6 +560,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-muted-foreground">{exam.subjects?.name} · {exam.total_marks ?? 0}Q · {exam.duration_minutes ?? 30}min</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => handleDownloadExamJson(exam.id, exam.title)} title="Download JSON" className="p-2 rounded-xl hover:bg-muted"><Download className="h-4 w-4 text-muted-foreground" /></button>
                     <button onClick={() => handleTogglePublish(exam)} className="p-2 rounded-xl hover:bg-muted"><Eye className="h-4 w-4 text-muted-foreground" /></button>
                     <button onClick={() => { setEditTarget(exam); setEditTitle(exam.title); setEditDuration(exam.duration_minutes ?? 30); setEditSubject(exam.subject_id); }} className="p-2 rounded-xl hover:bg-muted"><Pencil className="h-4 w-4" /></button>
                     <button onClick={() => setDeleteTarget(exam)} className="p-2 rounded-xl hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-destructive" /></button>
