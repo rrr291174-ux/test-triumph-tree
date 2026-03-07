@@ -263,7 +263,7 @@ export default function ExamTake() {
         {/* Objection button */}
         <button
           onClick={() => setObjectionOpen(true)}
-          className="flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-full mb-4 hover:bg-orange-100 transition-all active:scale-95"
+          className="flex items-center gap-2 text-sm font-bold text-orange-600 bg-orange-50 border border-orange-200 px-4 py-2 rounded-full mb-4 hover:bg-orange-100 transition-all active:scale-95"
         >
           <AlertTriangle className="h-3.5 w-3.5" /> Raise Objection
         </button>
