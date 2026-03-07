@@ -247,7 +247,7 @@ export default function ExamTake() {
             </span>
           )}
           {isMarked && (
-            <span className="bg-cyan-100 text-cyan-700 text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-cyan-100 text-cyan-700 text-sm font-bold px-3 py-1 rounded-full">
               🔖 Marked for Review
             </span>
           )}
