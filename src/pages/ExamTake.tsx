@@ -219,7 +219,7 @@ export default function ExamTake() {
           <div className="flex-1" />
           <button
             onClick={() => setDrawerOpen(true)}
-            className="text-xs font-bold px-3 py-1.5 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground transition-all"
+            className="text-sm font-bold px-4 py-2 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground transition-all"
           >
             ☰ Palette
           </button>
