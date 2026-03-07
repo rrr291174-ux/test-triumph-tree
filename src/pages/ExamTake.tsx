@@ -206,7 +206,7 @@ export default function ExamTake() {
             isWarn ? "bg-orange-100 text-orange-600 border border-orange-300" :
             "bg-gradient-to-r from-green-500 to-blue-500 text-white"
           }`}>
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-4 w-4" />
             {String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}
           </div>
         </div>
