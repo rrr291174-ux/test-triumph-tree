@@ -139,6 +139,10 @@ export default function AdminDashboard() {
   const [adminResponse, setAdminResponse] = useState("");
   const [respondStatus, setRespondStatus] = useState<"accepted" | "rejected">("accepted");
   const [responding, setResponding] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState(false);
+  const [editQText, setEditQText] = useState("");
+  const [editQOptions, setEditQOptions] = useState<string[]>([]);
+  const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
 
   // Load subjects
   useEffect(() => {
