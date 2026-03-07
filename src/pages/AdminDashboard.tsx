@@ -396,9 +396,24 @@ export default function AdminDashboard() {
   };
 
   // ─── Objection handlers ───
+  const [editingQuestion, setEditingQuestion] = useState(false);
+  const [editQText, setEditQText] = useState("");
+  const [editQOptions, setEditQOptions] = useState<string[]>([]);
+  const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
+
   const handleRespondObjection = async () => {
     if (!respondTarget) return;
     setResponding(true);
+
+    // If admin edited the question, update it
+    if (editingQuestion && respondTarget.question_id) {
+      await supabase.from("questions").update({
+        question_text: editQText,
+        options: editQOptions,
+        answer_index: editQAnswerIndex,
+      }).eq("id", respondTarget.question_id);
+    }
+
     await supabase.from("objections").update({
       status: respondStatus,
       admin_response: adminResponse.trim() || null,
@@ -406,6 +421,7 @@ export default function AdminDashboard() {
     setObjections(p => p.map(o => o.id === respondTarget.id ? { ...o, status: respondStatus, admin_response: adminResponse.trim() || null } : o));
     setRespondTarget(null);
     setAdminResponse("");
+    setEditingQuestion(false);
     setResponding(false);
     toast({ title: respondStatus === "accepted" ? "✅ Objection Accepted" : "❌ Objection Rejected" });
   };
