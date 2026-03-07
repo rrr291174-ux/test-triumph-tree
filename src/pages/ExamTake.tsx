@@ -242,8 +242,8 @@ export default function ExamTake() {
             Q {currentQ + 1} of {questions.length}
           </span>
           {answers[q.id] != null && (
-            <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" /> Answered
+            <span className="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full flex items-center gap-1">
+              <CheckCircle className="h-3.5 w-3.5" /> Answered
             </span>
           )}
           {isMarked && (
