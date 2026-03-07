@@ -201,7 +201,7 @@ export default function ExamTake() {
           </div>
 
           {/* Timer */}
-          <div className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-mono font-extrabold text-base shrink-0 ${
+          <div className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-mono font-extrabold text-lg shrink-0 ${
             isLow ? "bg-red-500 text-white animate-pulse" :
             isWarn ? "bg-orange-100 text-orange-600 border border-orange-300" :
             "bg-gradient-to-r from-green-500 to-blue-500 text-white"
