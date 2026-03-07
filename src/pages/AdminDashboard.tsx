@@ -400,11 +400,6 @@ export default function AdminDashboard() {
   };
 
   // ─── Objection handlers ───
-  const [editingQuestion, setEditingQuestion] = useState(false);
-  const [editQText, setEditQText] = useState("");
-  const [editQOptions, setEditQOptions] = useState<string[]>([]);
-  const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
-
   const handleRespondObjection = async () => {
     if (!respondTarget) return;
     setResponding(true);
