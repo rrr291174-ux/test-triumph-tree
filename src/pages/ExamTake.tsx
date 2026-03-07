@@ -238,7 +238,7 @@ export default function ExamTake() {
       <div className="flex-1 px-4 pt-4 pb-2 overflow-y-auto">
         {/* Q number */}
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="gradient-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-primary">
+          <span className="gradient-primary text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-primary">
             Q {currentQ + 1} of {questions.length}
           </span>
           {answers[q.id] != null && (
