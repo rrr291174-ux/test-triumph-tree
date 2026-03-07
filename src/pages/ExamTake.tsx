@@ -289,7 +289,7 @@ export default function ExamTake() {
                   }`}>
                     {String.fromCharCode(97 + i)}
                   </span>
-                  <span className={`text-xl font-bold leading-snug ${selected ? "text-white" : "text-foreground"}`}>
+                  <span className={`text-2xl font-bold leading-snug ${selected ? "text-white" : "text-foreground"}`}>
                     {opt}
                   </span>
                   {selected && <CheckCircle className="h-5 w-5 text-white ml-auto shrink-0" />}

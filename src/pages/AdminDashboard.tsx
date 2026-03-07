@@ -139,6 +139,10 @@ export default function AdminDashboard() {
   const [adminResponse, setAdminResponse] = useState("");
   const [respondStatus, setRespondStatus] = useState<"accepted" | "rejected">("accepted");
   const [responding, setResponding] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState(false);
+  const [editQText, setEditQText] = useState("");
+  const [editQOptions, setEditQOptions] = useState<string[]>([]);
+  const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
 
   // Load subjects
   useEffect(() => {
@@ -399,6 +403,16 @@ export default function AdminDashboard() {
   const handleRespondObjection = async () => {
     if (!respondTarget) return;
     setResponding(true);
+
+    // If admin edited the question, update it
+    if (editingQuestion && respondTarget.question_id) {
+      await supabase.from("questions").update({
+        question_text: editQText,
+        options: editQOptions,
+        answer_index: editQAnswerIndex,
+      }).eq("id", respondTarget.question_id);
+    }
+
     await supabase.from("objections").update({
       status: respondStatus,
       admin_response: adminResponse.trim() || null,
@@ -406,6 +420,7 @@ export default function AdminDashboard() {
     setObjections(p => p.map(o => o.id === respondTarget.id ? { ...o, status: respondStatus, admin_response: adminResponse.trim() || null } : o));
     setRespondTarget(null);
     setAdminResponse("");
+    setEditingQuestion(false);
     setResponding(false);
     toast({ title: respondStatus === "accepted" ? "✅ Objection Accepted" : "❌ Objection Rejected" });
   };
@@ -936,16 +951,87 @@ export default function AdminDashboard() {
       </Dialog>
 
       {/* ═══ RESPOND TO OBJECTION DIALOG ═══ */}
-      <Dialog open={!!respondTarget} onOpenChange={o => { if (!o) setRespondTarget(null); }}>
-        <DialogContent className="max-w-sm">
+      <Dialog open={!!respondTarget} onOpenChange={o => {
+        if (!o) { setRespondTarget(null); setEditingQuestion(false); }
+      }}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Respond to Objection</DialogTitle></DialogHeader>
           <div className="space-y-3">
+            {/* Question + Options display */}
             {respondTarget?.questions && (
-              <div className="bg-muted rounded-xl p-2.5">
-                <p className="text-xs font-bold text-muted-foreground mb-0.5">Question</p>
-                <p className="text-sm text-foreground line-clamp-3">{respondTarget.questions.question_text}</p>
+              <div className="bg-muted rounded-xl p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-muted-foreground">
+                    Question {respondTarget.questions.display_order || ""}
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (!editingQuestion) {
+                        const opts = Array.isArray(respondTarget.questions!.options) ? respondTarget.questions!.options as string[] : [];
+                        setEditQText(respondTarget.questions!.question_text);
+                        setEditQOptions([...opts]);
+                        setEditQAnswerIndex(respondTarget.questions!.answer_index);
+                      }
+                      setEditingQuestion(!editingQuestion);
+                    }}
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                  >
+                    <Pencil className="h-3 w-3" /> {editingQuestion ? "Cancel Edit" : "Edit Question"}
+                  </button>
+                </div>
+
+                {editingQuestion ? (
+                  <div className="space-y-2">
+                    <textarea
+                      value={editQText}
+                      onChange={e => setEditQText(e.target.value)}
+                      className="w-full rounded-lg border border-input bg-background px-2.5 py-2 text-sm resize-none h-20 focus:outline-none focus:border-primary"
+                    />
+                    {editQOptions.map((opt, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <button
+                          onClick={() => setEditQAnswerIndex(i)}
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 border-2 transition-all ${
+                            editQAnswerIndex === i ? "border-green-500 bg-green-50 text-green-700" : "border-border text-muted-foreground"
+                          }`}
+                        >
+                          {String.fromCharCode(97 + i)}
+                        </button>
+                        <input
+                          value={opt}
+                          onChange={e => {
+                            const newOpts = [...editQOptions];
+                            newOpts[i] = e.target.value;
+                            setEditQOptions(newOpts);
+                          }}
+                          className="flex-1 rounded-lg border border-input bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-muted-foreground">Click letter to set correct answer. Changes save with response.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <p className="text-sm text-foreground font-semibold">{respondTarget.questions.question_text}</p>
+                    {(Array.isArray(respondTarget.questions.options) ? respondTarget.questions.options as string[] : []).map((opt, i) => (
+                      <div key={i} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm ${
+                        i === respondTarget.questions!.answer_index ? "bg-green-50 border border-green-200 text-green-800 font-bold" : "bg-background border border-border text-foreground"
+                      }`}>
+                        <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0 ${
+                          i === respondTarget.questions!.answer_index ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                        }`}>
+                          {String.fromCharCode(97 + i)}
+                        </span>
+                        <span>{String(opt)}</span>
+                        {i === respondTarget.questions!.answer_index && <CheckCircle className="h-3.5 w-3.5 text-green-600 ml-auto" />}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
+
+            {/* User's objection */}
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5">
               <p className="text-xs font-bold text-orange-600 mb-0.5">User's Objection</p>
               <p className="text-sm text-orange-800">{respondTarget?.reason}</p>
@@ -955,6 +1041,8 @@ export default function AdminDashboard() {
                 <img src={respondTarget.image_url} alt="Attachment" className="rounded-xl w-full max-h-32 object-cover border border-border" />
               </a>
             )}
+
+            {/* Decision */}
             <label className="text-sm font-semibold text-foreground">Decision</label>
             <div className="flex gap-2">
               <button
@@ -979,7 +1067,7 @@ export default function AdminDashboard() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRespondTarget(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => { setRespondTarget(null); setEditingQuestion(false); }}>Cancel</Button>
             <Button onClick={handleRespondObjection} disabled={responding}>
               {responding ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Send className="h-4 w-4 mr-1" />}Save
             </Button>
