@@ -201,25 +201,25 @@ export default function ExamTake() {
           </div>
 
           {/* Timer */}
-          <div className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-mono font-extrabold text-base shrink-0 ${
+          <div className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-mono font-extrabold text-lg shrink-0 ${
             isLow ? "bg-red-500 text-white animate-pulse" :
             isWarn ? "bg-orange-100 text-orange-600 border border-orange-300" :
             "bg-gradient-to-r from-green-500 to-blue-500 text-white"
           }`}>
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-4 w-4" />
             {String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}
           </div>
         </div>
 
         {/* Stats + buttons row */}
         <div className="flex items-center gap-2 px-3 pb-2">
-          <span className="text-xs font-semibold bg-blue-500 text-white px-3 py-1 rounded-full">
+          <span className="text-sm font-bold bg-blue-500 text-white px-4 py-1.5 rounded-full">
             {answeredCount} / {questions.length} Answered
           </span>
           <div className="flex-1" />
           <button
             onClick={() => setDrawerOpen(true)}
-            className="text-xs font-bold px-3 py-1.5 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground transition-all"
+            className="text-sm font-bold px-4 py-2 rounded-xl border border-border bg-muted hover:bg-muted/80 text-foreground transition-all"
           >
             ☰ Palette
           </button>
@@ -238,16 +238,16 @@ export default function ExamTake() {
       <div className="flex-1 px-4 pt-4 pb-2 overflow-y-auto">
         {/* Q number */}
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="gradient-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-primary">
+          <span className="gradient-primary text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-primary">
             Q {currentQ + 1} of {questions.length}
           </span>
           {answers[q.id] != null && (
-            <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" /> Answered
+            <span className="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full flex items-center gap-1">
+              <CheckCircle className="h-3.5 w-3.5" /> Answered
             </span>
           )}
           {isMarked && (
-            <span className="bg-cyan-100 text-cyan-700 text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-cyan-100 text-cyan-700 text-sm font-bold px-3 py-1 rounded-full">
               🔖 Marked for Review
             </span>
           )}
@@ -263,9 +263,9 @@ export default function ExamTake() {
         {/* Objection button */}
         <button
           onClick={() => setObjectionOpen(true)}
-          className="flex items-center gap-1.5 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-full mb-4 hover:bg-orange-100 transition-all active:scale-95"
+          className="flex items-center gap-2 text-sm font-bold text-orange-600 bg-orange-50 border border-orange-200 px-4 py-2 rounded-full mb-4 hover:bg-orange-100 transition-all active:scale-95"
         >
-          <AlertTriangle className="h-3.5 w-3.5" /> Raise Objection
+          <AlertTriangle className="h-4 w-4" /> Raise Objection
         </button>
 
         {/* Options — (a) (b) (c) (d) style */}
