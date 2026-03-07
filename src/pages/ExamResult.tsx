@@ -300,18 +300,18 @@ export default function ExamResult() {
                     return (
                       <div key={j} className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 ${
                         isCorrectOpt
-                          ? `bg-gradient-to-r ${c.bg} border-transparent shadow-md`
+                          ? "bg-green-500 border-green-600 shadow-md"
                           : isWrongSelected
                           ? "bg-red-500 border-red-600 shadow-md"
-                          : `${c.light} border`
+                          : "bg-muted/30 border-border"
                       }`}>
                         <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-sm shrink-0 ${
-                          isCorrectOpt || isWrongSelected ? "bg-white/20 text-white" : `${c.badge} text-white`
+                          isCorrectOpt ? "bg-white/20 text-white" : isWrongSelected ? "bg-white/20 text-white" : "bg-muted text-foreground"
                         }`}>
                           {String.fromCharCode(97 + j)}
                         </span>
                         <span className={`flex-1 font-bold text-sm leading-snug ${
-                          isCorrectOpt || isWrongSelected ? "text-white" : ""
+                          isCorrectOpt || isWrongSelected ? "text-white" : "text-foreground"
                         }`}>
                           {opt}
                         </span>
