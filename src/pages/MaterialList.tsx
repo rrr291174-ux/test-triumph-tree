@@ -82,6 +82,10 @@ export default function MaterialList() {
     ? materials.filter(m => m.folder_id === selectedFolder.id)
     : [];
 
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo={`/subject/${subjectSlug}${state ? `?state=${state}` : ""}`} />;
+  }
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="gradient-hero px-4 pt-4 pb-8">

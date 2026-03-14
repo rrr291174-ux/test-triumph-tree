@@ -48,6 +48,10 @@ export default function ExamList() {
     fetch();
   }, [subjectSlug]);
 
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo={`/subject/${subjectSlug}`} />;
+  }
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="gradient-hero px-4 pt-4 pb-8">
