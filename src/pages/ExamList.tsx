@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useApproval } from "@/hooks/useApproval";
-import { LockedContent } from "@/components/LockedContent";
-import { ArrowLeft, FileText, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, Clock, Loader2, Lock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface Exam {
   id: string;
@@ -17,14 +17,14 @@ interface Exam {
 export default function ExamList() {
   const { subjectSlug } = useParams();
   const { user } = useAuth();
-  const { isApproved, loading: approvalLoading } = useApproval();
+  const { isApproved } = useApproval();
+  const navigate = useNavigate();
   const [exams, setExams] = useState<Exam[]>([]);
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
-      // Get subject
       const { data: subject } = await supabase
         .from("subjects")
         .select("id, name")
@@ -34,23 +34,27 @@ export default function ExamList() {
       if (!subject) { setLoading(false); return; }
       setSubjectName(subject.name);
 
-      const { data: examsData, error } = await supabase
+      const { data: examsData } = await supabase
         .from("exams")
         .select("id, title, duration_minutes, total_marks, created_at")
         .eq("subject_id", subject.id)
         .eq("is_published", true)
         .order("created_at", { ascending: false });
 
-      console.log("Exams fetched:", examsData, "Error:", error, "SubjectId:", subject.id);
       setExams(examsData || []);
       setLoading(false);
     };
     fetch();
   }, [subjectSlug]);
 
-  if (!approvalLoading && !isApproved) {
-    return <LockedContent backTo={`/subject/${subjectSlug}`} />;
-  }
+  const handleExamClick = (e: React.MouseEvent, examId: string) => {
+    if (!user) { navigate("/auth"); return; }
+    if (!isApproved) {
+      e.preventDefault();
+      toast({ title: "🔒 Premium Content", description: "Admin approval needed. Contact admin to unlock." });
+      return;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -73,32 +77,40 @@ export default function ExamList() {
             <p className="text-sm text-muted-foreground mt-1">Check back soon!</p>
           </div>
         ) : (
-          exams.map((exam, i) => (
-            <Link
-              key={exam.id}
-              to={user ? `/exam/${exam.id}` : "/auth"}
-              className="animate-slide-up block bg-card rounded-2xl p-4 shadow-card border border-border/50 hover:shadow-card-hover transition-all hover:-translate-y-0.5"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shrink-0">
-                  <FileText className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-heading font-semibold text-sm text-foreground truncate">{exam.title}</h3>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" /> {exam.duration_minutes} min
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {exam.total_marks} Q
-                    </span>
+          exams.map((exam, i) => {
+            const locked = !isApproved;
+            return (
+              <Link
+                key={exam.id}
+                to={locked ? "#" : (user ? `/exam/${exam.id}` : "/auth")}
+                onClick={(e) => locked ? handleExamClick(e, exam.id) : undefined}
+                className={`animate-slide-up block bg-card rounded-2xl p-4 shadow-card border border-border/50 transition-all ${locked ? "opacity-80" : "hover:shadow-card-hover hover:-translate-y-0.5"}`}
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${locked ? "bg-muted" : "gradient-primary"}`}>
+                    {locked ? <Lock className="h-5 w-5 text-muted-foreground" /> : <FileText className="h-5 w-5 text-primary-foreground" />}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-heading font-semibold text-sm text-foreground truncate">{exam.title}</h3>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" /> {exam.duration_minutes} min
+                      </span>
+                      <span className="text-xs text-muted-foreground">{exam.total_marks} Q</span>
+                    </div>
+                  </div>
+                  {locked ? (
+                    <span className="bg-muted text-muted-foreground text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                      <Lock className="h-3 w-3" /> Premium
+                    </span>
+                  ) : (
+                    <span className="gradient-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">Start</span>
+                  )}
                 </div>
-                <span className="gradient-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">Start</span>
-              </div>
-            </Link>
-          ))
+              </Link>
+            );
+          })
         )}
       </div>
     </div>
