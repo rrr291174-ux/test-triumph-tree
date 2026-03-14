@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { ArrowLeft, FileText, Clock, Loader2 } from "lucide-react";
 
 interface Exam {
