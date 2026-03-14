@@ -226,7 +226,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); fetchObjections(); }
+    if (isAdmin) { fetchExams(); fetchMaterials(); fetchClasses(); fetchFolders(); fetchObjections(); fetchApprovedUsers(); }
   }, [isAdmin]);
 
   // Auth guards
