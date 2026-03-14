@@ -167,6 +167,10 @@ export default function ExamTake() {
     return "unvisited";
   }
 
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo="/" />;
+  }
+
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background">
       <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-primary animate-pulse">
