@@ -27,6 +27,7 @@ export default function MaterialList() {
   const { subjectSlug } = useParams();
   const [searchParams] = useSearchParams();
   const state = searchParams.get("state") || "";
+  const { isApproved, loading: approvalLoading } = useApproval();
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [subjectName, setSubjectName] = useState("");
