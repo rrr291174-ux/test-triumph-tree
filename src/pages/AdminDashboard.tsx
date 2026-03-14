@@ -144,6 +144,25 @@ export default function AdminDashboard() {
   const [editQOptions, setEditQOptions] = useState<string[]>([]);
   const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
 
+  // ─── Approved Users state ───
+  interface ApprovedUser { id: string; user_id: string; note: string | null; created_at: string; }
+  const [approvedUsers, setApprovedUsers] = useState<ApprovedUser[]>([]);
+  const [approvedLoading, setApprovedLoading] = useState(true);
+  const [newUserId, setNewUserId] = useState("");
+  const [newUserNote, setNewUserNote] = useState("");
+  const [addingUser, setAddingUser] = useState(false);
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+
+  const fetchApprovedUsers = async () => {
+    setApprovedLoading(true);
+    const { data } = await supabase
+      .from("approved_users")
+      .select("id, user_id, note, created_at")
+      .order("created_at", { ascending: false });
+    setApprovedUsers((data as ApprovedUser[]) || []);
+    setApprovedLoading(false);
+  };
+
   // Load subjects
   useEffect(() => {
     supabase.from("subjects").select("id, name, slug").order("display_order").then(({ data }) => {
