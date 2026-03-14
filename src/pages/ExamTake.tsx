@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Clock, BookOpen, CheckCircle, X, AlertTriangle } from "lucide-react";
 import ObjectionModal from "@/components/ObjectionModal";
