@@ -54,7 +54,7 @@ interface ObjectionItem {
   exams?: { title: string } | null;
 }
 
-type Tab = "exams" | "material" | "classes" | "objections";
+type Tab = "exams" | "material" | "classes" | "objections" | "users";
 
 interface QuestionJSON { question: string; options: string[]; answer_index: number; }
 
