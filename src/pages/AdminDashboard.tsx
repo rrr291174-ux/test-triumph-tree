@@ -144,23 +144,35 @@ export default function AdminDashboard() {
   const [editQOptions, setEditQOptions] = useState<string[]>([]);
   const [editQAnswerIndex, setEditQAnswerIndex] = useState(0);
 
-  // ─── Approved Users state ───
-  interface ApprovedUser { id: string; user_id: string; note: string | null; created_at: string; }
-  const [approvedUsers, setApprovedUsers] = useState<ApprovedUser[]>([]);
-  const [approvedLoading, setApprovedLoading] = useState(true);
-  const [newUserId, setNewUserId] = useState("");
-  const [newUserNote, setNewUserNote] = useState("");
-  const [addingUser, setAddingUser] = useState(false);
-  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
+  // ─── Users state ───
+  interface ProfileUser { user_id: string; full_name: string | null; created_at: string; }
+  const [allUsers, setAllUsers] = useState<ProfileUser[]>([]);
+  const [approvedSet, setApprovedSet] = useState<Set<string>>(new Set());
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
 
   const fetchApprovedUsers = async () => {
-    setApprovedLoading(true);
-    const { data } = await supabase
-      .from("approved_users")
-      .select("id, user_id, note, created_at")
-      .order("created_at", { ascending: false });
-    setApprovedUsers((data as ApprovedUser[]) || []);
-    setApprovedLoading(false);
+    setUsersLoading(true);
+    const [{ data: profiles }, { data: approved }] = await Promise.all([
+      supabase.from("profiles").select("user_id, full_name, created_at").order("created_at", { ascending: false }),
+      supabase.from("approved_users").select("user_id"),
+    ]);
+    setAllUsers((profiles as ProfileUser[]) || []);
+    setApprovedSet(new Set((approved || []).map((a: any) => a.user_id)));
+    setUsersLoading(false);
+  };
+
+  const toggleApproval = async (userId: string, currentlyApproved: boolean) => {
+    setTogglingUserId(userId);
+    if (currentlyApproved) {
+      await supabase.from("approved_users").delete().eq("user_id", userId);
+      toast({ title: "🔒 Access Removed" });
+    } else {
+      await supabase.from("approved_users").insert({ user_id: userId, approved_by: user!.id });
+      toast({ title: "✅ Access Granted!" });
+    }
+    await fetchApprovedUsers();
+    setTogglingUserId(null);
   };
 
   // Load subjects
