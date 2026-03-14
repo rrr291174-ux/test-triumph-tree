@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { ArrowLeft, BookOpen, FileText, Loader2, ExternalLink, Folder, FolderOpen } from "lucide-react";
 
 interface FolderItem {
