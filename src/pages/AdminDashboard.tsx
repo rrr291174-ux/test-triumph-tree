@@ -799,6 +799,101 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
+
+        {/* ═══ USERS TAB ═══ */}
+        {tab === "users" && (
+          <div className="space-y-3">
+            {/* Add user form */}
+            <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50 space-y-3">
+              <h3 className="font-heading font-semibold text-sm text-foreground flex items-center gap-2">
+                <UserPlus className="h-4 w-4 text-primary" /> Add Approved User
+              </h3>
+              <Input
+                placeholder="Paste User ID here..."
+                value={newUserId}
+                onChange={e => setNewUserId(e.target.value)}
+                className="rounded-xl font-mono text-xs"
+              />
+              <Input
+                placeholder="Note (optional) e.g., Student Name"
+                value={newUserNote}
+                onChange={e => setNewUserNote(e.target.value)}
+                className="rounded-xl"
+              />
+              <Button
+                className="w-full rounded-xl"
+                disabled={!newUserId.trim() || addingUser}
+                onClick={async () => {
+                  setAddingUser(true);
+                  const { error } = await supabase.from("approved_users").insert({
+                    user_id: newUserId.trim(),
+                    approved_by: user!.id,
+                    note: newUserNote.trim() || null,
+                  });
+                  if (error) {
+                    toast({ title: "❌ Error", description: error.message.includes("duplicate") ? "User already approved!" : error.message, variant: "destructive" });
+                  } else {
+                    toast({ title: "✅ User Approved!" });
+                    setNewUserId("");
+                    setNewUserNote("");
+                    fetchApprovedUsers();
+                  }
+                  setAddingUser(false);
+                }}
+              >
+                {addingUser ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <UserPlus className="h-4 w-4 mr-1" />}
+                Approve User
+              </Button>
+            </div>
+
+            {/* Approved users list */}
+            {approvedLoading ? (
+              <div className="flex justify-center py-8"><Loader2 className="animate-spin h-6 w-6 text-primary" /></div>
+            ) : approvedUsers.length === 0 ? (
+              <div className="bg-card rounded-2xl p-8 shadow-card border border-border/50 text-center">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <p className="font-heading font-semibold text-foreground">No approved users yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Paste a User ID above to grant access</p>
+              </div>
+            ) : (
+              approvedUsers.map((au, i) => (
+                <div
+                  key={au.id}
+                  className="animate-slide-up bg-card rounded-2xl p-4 shadow-card border border-border/50"
+                  style={{ animationDelay: `${i * 40}ms` }}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                      <UserCheck className="h-5 w-5 text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <code className="text-[10px] text-muted-foreground break-all block">{au.user_id}</code>
+                      {au.note && <p className="text-sm font-semibold text-foreground mt-0.5">{au.note}</p>}
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(au.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setRemovingUserId(au.id);
+                        await supabase.from("approved_users").delete().eq("id", au.id);
+                        toast({ title: "🔒 Access Removed" });
+                        fetchApprovedUsers();
+                        setRemovingUserId(null);
+                      }}
+                      disabled={removingUserId === au.id}
+                      className="shrink-0 p-2 rounded-xl bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                    >
+                      {removingUserId === au.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-destructive" />
+                      ) : (
+                        <UserX className="h-4 w-4 text-destructive" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* ═══ UPLOAD EXAM DIALOG ═══ */}
