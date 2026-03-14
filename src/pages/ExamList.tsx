@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { ArrowLeft, FileText, Clock, Loader2 } from "lucide-react";
 
 interface Exam {
@@ -15,6 +17,7 @@ interface Exam {
 export default function ExamList() {
   const { subjectSlug } = useParams();
   const { user } = useAuth();
+  const { isApproved, loading: approvalLoading } = useApproval();
   const [exams, setExams] = useState<Exam[]>([]);
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,6 +47,10 @@ export default function ExamList() {
     };
     fetch();
   }, [subjectSlug]);
+
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo={`/subject/${subjectSlug}`} />;
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">

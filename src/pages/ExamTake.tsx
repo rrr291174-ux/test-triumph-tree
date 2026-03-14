@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Clock, BookOpen, CheckCircle, X, AlertTriangle } from "lucide-react";
 import ObjectionModal from "@/components/ObjectionModal";
@@ -47,6 +49,7 @@ function getPaletteCls(state: QState, isCurrent: boolean, shapeIdx: number): str
 export default function ExamTake() {
   const { examId } = useParams();
   const { user } = useAuth();
+  const { isApproved, loading: approvalLoading } = useApproval();
   const navigate = useNavigate();
 
   const [exam, setExam] = useState<ExamInfo | null>(null);
@@ -162,6 +165,10 @@ export default function ExamTake() {
     if (hasAns) return "answered";
     if (visited.has(i)) return "not-answered";
     return "unvisited";
+  }
+
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo="/" />;
   }
 
   if (loading) return (

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useApproval } from "@/hooks/useApproval";
+import { LockedContent } from "@/components/LockedContent";
 import { ArrowLeft, BookOpen, FileText, Loader2, ExternalLink, Folder, FolderOpen } from "lucide-react";
 
 interface FolderItem {
@@ -25,6 +27,7 @@ export default function MaterialList() {
   const { subjectSlug } = useParams();
   const [searchParams] = useSearchParams();
   const state = searchParams.get("state") || "";
+  const { isApproved, loading: approvalLoading } = useApproval();
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [subjectName, setSubjectName] = useState("");
@@ -78,6 +81,10 @@ export default function MaterialList() {
   const folderMaterials = selectedFolder
     ? materials.filter(m => m.folder_id === selectedFolder.id)
     : [];
+
+  if (!approvalLoading && !isApproved) {
+    return <LockedContent backTo={`/subject/${subjectSlug}${state ? `?state=${state}` : ""}`} />;
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
