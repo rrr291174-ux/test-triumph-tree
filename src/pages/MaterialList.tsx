@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useApproval } from "@/hooks/useApproval";
-import { LockedContent } from "@/components/LockedContent";
-import { ArrowLeft, BookOpen, FileText, Loader2, ExternalLink, Folder, FolderOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, FileText, Loader2, ExternalLink, Folder, FolderOpen, Lock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface FolderItem {
   id: string;
@@ -27,7 +27,7 @@ export default function MaterialList() {
   const { subjectSlug } = useParams();
   const [searchParams] = useSearchParams();
   const state = searchParams.get("state") || "";
-  const { isApproved, loading: approvalLoading } = useApproval();
+  const { isApproved } = useApproval();
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [subjectName, setSubjectName] = useState("");
@@ -45,7 +45,6 @@ export default function MaterialList() {
       if (!subject) { setLoading(false); return; }
       setSubjectName(subject.name);
 
-      // Fetch folders
       let folderQuery = supabase
         .from("folders")
         .select("id, name, subject_id, state, created_at")
@@ -59,7 +58,6 @@ export default function MaterialList() {
       const { data: folderData } = await folderQuery;
       setFolders(folderData || []);
 
-      // Fetch all materials for this subject
       let matQuery = supabase
         .from("materials")
         .select("id, title, description, file_url, file_type, folder_id, created_at")
@@ -82,9 +80,14 @@ export default function MaterialList() {
     ? materials.filter(m => m.folder_id === selectedFolder.id)
     : [];
 
-  if (!approvalLoading && !isApproved) {
-    return <LockedContent backTo={`/subject/${subjectSlug}${state ? `?state=${state}` : ""}`} />;
-  }
+  const locked = !isApproved;
+
+  const handleLockedClick = (e: React.MouseEvent) => {
+    if (locked) {
+      e.preventDefault();
+      toast({ title: "🔒 Premium Content", description: "Admin approval needed. Contact admin to unlock." });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -112,7 +115,6 @@ export default function MaterialList() {
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div>
         ) : selectedFolder ? (
-          /* ── Files inside folder ── */
           folderMaterials.length === 0 ? (
             <div className="bg-card rounded-2xl p-8 shadow-card border border-border/50 text-center">
               <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
@@ -123,28 +125,34 @@ export default function MaterialList() {
             folderMaterials.map((mat, i) => (
               <a
                 key={mat.id}
-                href={mat.file_url || "#"}
-                target="_blank"
+                href={locked ? "#" : (mat.file_url || "#")}
+                target={locked ? undefined : "_blank"}
                 rel="noopener noreferrer"
-                className="animate-slide-up block bg-card rounded-2xl p-4 shadow-card border border-border/50 hover:shadow-card-hover transition-all hover:-translate-y-0.5"
+                onClick={handleLockedClick}
+                className={`animate-slide-up block bg-card rounded-2xl p-4 shadow-card border border-border/50 transition-all ${locked ? "opacity-80" : "hover:shadow-card-hover hover:-translate-y-0.5"}`}
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl gradient-secondary flex items-center justify-center shrink-0">
-                    <FileText className="h-5 w-5 text-primary-foreground" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${locked ? "bg-muted" : "gradient-secondary"}`}>
+                    {locked ? <Lock className="h-5 w-5 text-muted-foreground" /> : <FileText className="h-5 w-5 text-primary-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-heading font-semibold text-sm text-foreground truncate">{mat.title}</h3>
                     {mat.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{mat.description}</p>}
                     <span className="text-xs text-muted-foreground mt-1 inline-block">{mat.file_type?.toUpperCase() || "FILE"}</span>
                   </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
+                  {locked ? (
+                    <span className="bg-muted text-muted-foreground text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Lock className="h-3 w-3" /> Premium
+                    </span>
+                  ) : (
+                    <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
+                  )}
                 </div>
               </a>
             ))
           )
         ) : (
-          /* ── Folder list ── */
           folders.length === 0 ? (
             <div className="bg-card rounded-2xl p-8 shadow-card border border-border/50 text-center">
               <Folder className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
