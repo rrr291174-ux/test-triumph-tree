@@ -496,7 +496,7 @@ export default function AdminDashboard() {
     { id: "material", label: "Material", icon: BookOpen, count: materials.length },
     { id: "classes", label: "Classes", icon: Video, count: classes.length },
     { id: "objections", label: "Objections", icon: AlertTriangle, count: pendingObjCount },
-    { id: "users", label: "Users", icon: Users, count: approvedUsers.length },
+    { id: "users", label: "Users", icon: Users, count: allUsers.length },
   ];
 
   const filteredExams = exams.filter(e => {
