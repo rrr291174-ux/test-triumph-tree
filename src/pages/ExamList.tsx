@@ -17,6 +17,7 @@ interface Exam {
 export default function ExamList() {
   const { subjectSlug } = useParams();
   const { user } = useAuth();
+  const { isApproved, loading: approvalLoading } = useApproval();
   const [exams, setExams] = useState<Exam[]>([]);
   const [subjectName, setSubjectName] = useState("");
   const [loading, setLoading] = useState(true);
