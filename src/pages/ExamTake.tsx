@@ -49,6 +49,7 @@ function getPaletteCls(state: QState, isCurrent: boolean, shapeIdx: number): str
 export default function ExamTake() {
   const { examId } = useParams();
   const { user } = useAuth();
+  const { isApproved, loading: approvalLoading } = useApproval();
   const navigate = useNavigate();
 
   const [exam, setExam] = useState<ExamInfo | null>(null);
