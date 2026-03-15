@@ -358,18 +358,27 @@ const Index = () => {
 
 
 
-      {/* Select Your State */}
+      {/* Choose Your State */}
       <div className="px-4 mb-4">
         <motion.div
-          className="flex items-center gap-3 mb-4"
+          className="flex items-center gap-3 mb-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(245,158,11,0.5))" }} />
-          <span className="font-bold text-sm tracking-widest uppercase" style={{ color: isDark ? "#fff" : "#1e3a8a" }}>Select Your State</span>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">👈</span>
+            <span className="font-heading font-black text-xl" style={{ color: isDark ? "#fff" : "#1e293b" }}>
+              Choose Your State
+            </span>
+          </div>
           <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(245,158,11,0.5), transparent)" }} />
         </motion.div>
+        {/* Underline accent */}
+        <div className="flex justify-center -mt-4 mb-5">
+          <div className="w-20 h-1 rounded-full" style={{ background: "linear-gradient(90deg, #f97316, #fbbf24)" }} />
+        </div>
 
         {/* State Cards */}
         <motion.div
@@ -385,149 +394,104 @@ const Index = () => {
                 key={state.id}
                 onClick={() => handleStateSelect(state.id)}
                 className="w-full text-left relative overflow-hidden"
-                style={{ borderRadius: "20px", minHeight: "130px" }}
+                style={{
+                  borderRadius: "18px",
+                  minHeight: "180px",
+                  border: `2.5px solid ${state.borderColor}`,
+                  boxShadow: isSelected
+                    ? `0 0 30px ${state.borderColor}55, 0 8px 32px rgba(0,0,0,0.3)`
+                    : `0 4px 20px rgba(0,0,0,0.15)`,
+                }}
                 variants={subjectItem}
-                animate={isSelected ? { scale: 1.025 } : { scale: 1 }}
+                animate={isSelected ? { scale: 1.02 } : { scale: 1 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 {/* Full scenic background image */}
                 <img
                   src={state.image}
-                  alt={`${state.name}`}
+                  alt={state.name}
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ borderRadius: "20px" }}
+                  style={{ borderRadius: "15px" }}
                 />
 
-                {/* Left gradient overlay for text readability */}
+                {/* Gradient overlay for text readability */}
                 <div
                   className="absolute inset-0"
                   style={{
-                    borderRadius: "20px",
-                    background: isDark
-                      ? "linear-gradient(90deg, rgba(10,15,40,0.88) 0%, rgba(10,15,40,0.75) 45%, rgba(10,15,40,0.15) 75%, transparent 100%)"
-                      : "linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)",
+                    borderRadius: "15px",
+                    background: "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.1) 75%, transparent 100%)",
                   }}
                 />
 
-                {/* Glow border */}
-                <motion.div
-                  className="absolute inset-0"
-                  style={{ borderRadius: "20px" }}
-                  animate={{
-                    boxShadow: isSelected
-                      ? "0 0 28px rgba(249,115,22,0.65), 0 0 55px rgba(249,115,22,0.25), inset 0 0 0 2.5px rgba(249,115,22,0.9)"
-                      : "0 6px 28px rgba(0,0,0,0.6), inset 0 0 0 1.5px rgba(245,158,11,0.35)",
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-
-                {/* Selected golden top bar */}
-                <AnimatePresence>
-                  {isSelected && (
-                    <motion.div
-                      className="absolute top-0 left-0 right-0 h-[3px]"
-                      style={{
-                        borderRadius: "20px 20px 0 0",
-                        background: "linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent)",
-                      }}
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      animate={{ scaleX: 1, opacity: 1 }}
-                      exit={{ scaleX: 0, opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                    />
-                  )}
-                </AnimatePresence>
-
-                {/* Indian tricolor ribbon at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 h-[5px] overflow-hidden" style={{ borderRadius: "0 0 20px 20px" }}>
-                  <div className={`h-full w-full bg-gradient-to-r ${state.stripColors}`} />
+                {/* DSC ADDA branding top-left */}
+                <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
+                  <img src={logoImg} alt="DSC ADDA" className="w-7 h-7 rounded-md" />
+                  <span
+                    className="font-heading font-extrabold text-sm tracking-wide"
+                    style={{ color: "#fff", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}
+                  >
+                    DSC ADDA
+                  </span>
                 </div>
 
                 {/* Text content overlay */}
-                <div className="relative z-10 p-4 flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    {/* State name */}
-                    <div
-                      className="font-heading font-black text-[1.45rem] leading-tight tracking-tight mb-1"
+                <div className="relative z-10 p-4 pt-12 flex flex-col gap-2">
+                  {/* Location + State name */}
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: state.borderColor }} />
+                    <span
+                      className="font-heading font-black text-[1.7rem] leading-tight"
                       style={{
                         color: "#fff",
-                        textShadow: "0 2px 12px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.5)",
-                        letterSpacing: "-0.01em",
+                        textShadow: "0 2px 12px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.5)",
                       }}
                     >
                       {state.name}
-                    </div>
+                    </span>
+                  </div>
 
-                    {/* Capital subtitle */}
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <MapPin className="h-3 w-3 flex-shrink-0" style={{ color: "#f97316" }} />
-                      <span
-                        className="text-xs font-semibold"
-                        style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
-                      >
-                        {state.capital}
-                      </span>
-                    </div>
-
-                    {/* Tags */}
-                    <div
-                      className="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wide"
+                  {/* Tag badge */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <span
+                      className="px-3 py-1 rounded-md text-xs font-bold"
                       style={{
-                        background: "rgba(255,255,255,0.12)",
-                        border: "1px solid rgba(249,115,22,0.7)",
-                        color: "#fff",
+                        background: "rgba(255,255,255,0.15)",
                         backdropFilter: "blur(8px)",
-                        boxShadow: "0 0 14px rgba(249,115,22,0.3)",
+                        color: "#fff",
+                        border: "1px solid rgba(255,255,255,0.25)",
                         textShadow: "0 1px 4px rgba(0,0,0,0.6)",
                       }}
                     >
-                      <span style={{ color: "#fb923c" }}>{state.desc}</span>
-                    </div>
+                      {state.tag}
+                    </span>
                   </div>
 
-                  {/* Telangana: Charminar + Map overlay on right */}
-                  {state.id === "ts" && (
-                    <div className="flex-shrink-0 flex flex-col items-center ml-2 gap-1">
-                      {/* Charminar */}
-                      <div className="relative w-16 h-16">
-                        <img
-                          src={charminarImg}
-                          alt="Charminar"
-                          className="w-full h-full object-cover rounded-xl"
-                          style={{
-                            boxShadow: "0 0 18px rgba(249,115,22,0.7), 0 0 36px rgba(249,115,22,0.3)",
-                            border: "1.5px solid rgba(249,115,22,0.6)",
-                          }}
-                        />
-                      </div>
-                      {/* Telangana Map */}
-                      <div className="relative w-12 h-12">
-                        <img
-                          src={telanganaMapImg}
-                          alt="Telangana Map"
-                          className="w-full h-full object-contain"
-                          style={{
-                            filter: "drop-shadow(0 0 8px #ec4899) drop-shadow(0 0 16px #f97316)",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Arrow button */}
-                  <motion.div
-                    className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ml-2"
-                    style={{
-                      background: "linear-gradient(135deg, #ea580c, #f97316)",
-                      boxShadow: "0 4px 16px rgba(249,115,22,0.7)",
-                    }}
-                    animate={isSelected ? { rotate: 90 } : { rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 250, damping: 18 }}
-                  >
-                    <ChevronRight className="h-5 w-5 text-white" />
-                  </motion.div>
+                  {/* Start Learning button */}
+                  <div>
+                    <span
+                      className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-extrabold text-white"
+                      style={{
+                        background: state.btnGradient,
+                        boxShadow: state.btnShadow,
+                        border: "1px solid rgba(255,255,255,0.2)",
+                      }}
+                    >
+                      Start Learning
+                      <ChevronRight className="h-4 w-4" />
+                    </span>
+                  </div>
                 </div>
+
+                {/* Bottom glow line */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-[3px]"
+                  style={{
+                    borderRadius: "0 0 15px 15px",
+                    background: `linear-gradient(90deg, transparent, ${state.borderColor}, transparent)`,
+                    boxShadow: `0 0 12px ${state.borderColor}88`,
+                  }}
+                />
               </motion.button>
             );
           })}
