@@ -2,10 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, MapPin, Rocket, BookOpen, Trophy, FileText, Video } from "lucide-react";
-import apStateCard from "@/assets/ap-state-card.png";
-import tsStateCard from "@/assets/ts-state-card.png";
-import charminarImg from "@/assets/charminar-3d.png";
-import telanganaMapImg from "@/assets/telangana-map.png";
+import apScenicBanner from "@/assets/ap-scenic-banner.jpg";
+import tsScenicBanner from "@/assets/ts-scenic-banner.jpg";
+import logoImg from "@/assets/logo.png";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
