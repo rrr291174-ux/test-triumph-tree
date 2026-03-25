@@ -1,31 +1,86 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>DSC ADDA</title>
-    <meta name="description" content="TET DSC EXAMS">
-    <meta name="author" content="Lovable" />
+import { Home, BarChart2, User, Moon } from "lucide-react";
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/gJVIN8IA9ZTp4eka1inbJcsypWJ2/social-images/social-1773469274993-IMG_20260314_115058_475.webp">
+export default function HomePage() {
+  return (
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/gJVIN8IA9ZTp4eka1inbJcsypWJ2/social-images/social-1773469274993-IMG_20260314_115058_475.webp">
-    <meta property="og:title" content="DSC ADDA">
-  <meta name="twitter:title" content="DSC ADDA">
-  <meta property="og:description" content="TET DSC EXAMS">
-  <meta name="twitter:description" content="TET DSC EXAMS">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-</head>
+      {/* HEADER */}
+      <div className="flex justify-between items-center p-4 bg-white shadow">
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" className="w-10" />
+          <h1 className="text-xl font-bold">DSC ADDA</h1>
+        </div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+        <div className="flex items-center gap-3">
+          <Moon className="w-5 h-5" />
+          <div className="bg-gray-200 px-3 py-1 rounded-full flex items-center gap-2">
+            <span>User</span>
+            <div className="bg-purple-600 text-white w-7 h-7 flex items-center justify-center rounded-full">
+              U
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* HERO */}
+      <div className="p-4">
+        <div className="bg-gradient-to-r from-blue-900 to-purple-700 text-white rounded-2xl p-6 shadow-lg">
+          <p className="text-sm mb-2">🌿 AP & TG 🌿</p>
+          <h2 className="text-3xl font-bold mb-2">
+            Best Study Platform 🎯
+          </h2>
+          <p className="text-sm mb-4">
+            Complete preparation with Test Series, Notes & Live Classes
+          </p>
+
+          <button className="bg-orange-500 px-5 py-2 rounded-full font-semibold shadow-lg hover:scale-105 transition">
+            🚀 Start Practice
+          </button>
+        </div>
+      </div>
+
+      {/* STATE SELECT */}
+      <div className="px-4">
+        <h2 className="text-xl font-bold text-center mb-4">
+          Choose Your State 👇
+        </h2>
+
+        {/* AP CARD */}
+        <div className="bg-gradient-to-r from-orange-600 to-yellow-500 text-white rounded-2xl p-4 mb-4 shadow-lg">
+          <h3 className="text-xl font-bold">Andhra Pradesh</h3>
+          <p className="text-sm mb-3">AP DSC</p>
+          <button className="bg-white text-orange-600 px-4 py-1 rounded-full font-semibold">
+            Start Learning →
+          </button>
+        </div>
+
+        {/* TS CARD */}
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-400 text-white rounded-2xl p-4 shadow-lg">
+          <h3 className="text-xl font-bold">Telangana</h3>
+          <p className="text-sm mb-3">TS DSC</p>
+          <button className="bg-white text-blue-600 px-4 py-1 rounded-full font-semibold">
+            Start Learning →
+          </button>
+        </div>
+      </div>
+
+      {/* BOTTOM NAV */}
+      <div className="bg-white shadow-inner p-3 flex justify-around">
+        <div className="flex flex-col items-center text-orange-500">
+          <Home />
+          <span className="text-sm">Home</span>
+        </div>
+
+        <div className="flex flex-col items-center text-gray-500">
+          <BarChart2 />
+          <span className="text-sm">Progress</span>
+        </div>
+
+        <div className="flex flex-col items-center text-gray-500">
+          <User />
+          <span className="text-sm">Profile</span>
+        </div>
+      </div>
+    </div>
+  );
+}
