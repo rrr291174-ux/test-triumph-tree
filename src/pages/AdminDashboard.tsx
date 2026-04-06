@@ -951,7 +951,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-semibold">{matFiles.length > 0 ? `${matFiles.length} file(s) selected` : "Select Files (multi-select)"}</p>
               {matFiles.length > 0 && <p className="text-xs text-muted-foreground mt-1">{matFiles.map(f => f.name).join(", ")}</p>}
             </div>
-            <input ref={matFileRef} type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png,.jpeg,.webp" multiple onChange={e => setMatFiles(e.target.files ? Array.from(e.target.files) : [])} className="hidden" />
+            <input ref={matFileRef} type="file" accept="*/*" multiple onChange={e => setMatFiles(e.target.files ? Array.from(e.target.files) : [])} className="hidden" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddMaterial(false)}>Cancel</Button>
