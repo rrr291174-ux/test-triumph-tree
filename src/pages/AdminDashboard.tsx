@@ -130,6 +130,8 @@ export default function AdminDashboard() {
   const [classUrl, setClassUrl] = useState("");
   const [classDuration, setClassDuration] = useState(60);
   const [classAdding, setClassAdding] = useState(false);
+  const [classVideoFile, setClassVideoFile] = useState<File | null>(null);
+  const classVideoRef = useRef<HTMLInputElement>(null);
 
   // ─── Objections state ───
   const [objections, setObjections] = useState<ObjectionItem[]>([]);
@@ -393,12 +395,21 @@ export default function AdminDashboard() {
 
   // ─── Class handler ───
   const handleAddClass = async () => {
-    if (!classTitle.trim() || !classSubject || !classUrl.trim()) return;
+    if (!classTitle.trim() || !classSubject) return;
+    if (!classUrl.trim() && !classVideoFile) return;
     setClassAdding(true);
     try {
-      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: classUrl.trim(), duration_minutes: classDuration, created_by: user!.id, state: classState });
+      let videoUrl = classUrl.trim();
+      if (classVideoFile) {
+        const path = `classes/${classSubject}/${Date.now()}-${classVideoFile.name}`;
+        const { error: upErr } = await supabase.storage.from("materials").upload(path, classVideoFile);
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
+        videoUrl = urlData.publicUrl;
+      }
+      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: videoUrl, duration_minutes: classDuration, created_by: user!.id, state: classState });
       toast({ title: "✅ Class added!" });
-      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60);
+      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60); setClassVideoFile(null);
       fetchClasses();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
@@ -978,12 +989,19 @@ export default function AdminDashboard() {
             </select>
             <Input placeholder="Class Title" value={classTitle} onChange={e => setClassTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={classDesc} onChange={e => setClassDesc(e.target.value)} className="rounded-xl" />
-            <Input placeholder="YouTube / Video URL" value={classUrl} onChange={e => setClassUrl(e.target.value)} className="rounded-xl" />
+            <Input placeholder="YouTube / Video URL (optional if uploading)" value={classUrl} onChange={e => setClassUrl(e.target.value)} className="rounded-xl" />
+            <div className="text-center text-xs text-muted-foreground font-medium">— OR Upload Video File —</div>
+            <div onClick={() => classVideoRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
+              <Video className="h-8 w-8 text-primary mx-auto mb-1" />
+              <p className="text-sm font-semibold">{classVideoFile ? classVideoFile.name : "Select Video File"}</p>
+              {classVideoFile && <p className="text-xs text-muted-foreground mt-1">{(classVideoFile.size / 1024 / 1024).toFixed(1)} MB</p>}
+            </div>
+            <input ref={classVideoRef} type="file" accept="video/*" onChange={e => setClassVideoFile(e.target.files?.[0] || null)} className="hidden" />
             <Input type="number" placeholder="Duration (min)" value={classDuration} onChange={e => setClassDuration(Number(e.target.value))} min={1} className="rounded-xl" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddClass(false)}>Cancel</Button>
-            <Button onClick={handleAddClass} disabled={!classTitle.trim() || !classSubject || !classUrl.trim() || classAdding}>
+            <Button onClick={handleAddClass} disabled={!classTitle.trim() || !classSubject || (!classUrl.trim() && !classVideoFile) || classAdding}>
               {classAdding ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Add Class
             </Button>
           </DialogFooter>
