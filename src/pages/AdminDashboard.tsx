@@ -989,12 +989,19 @@ export default function AdminDashboard() {
             </select>
             <Input placeholder="Class Title" value={classTitle} onChange={e => setClassTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={classDesc} onChange={e => setClassDesc(e.target.value)} className="rounded-xl" />
-            <Input placeholder="YouTube / Video URL" value={classUrl} onChange={e => setClassUrl(e.target.value)} className="rounded-xl" />
+            <Input placeholder="YouTube / Video URL (optional if uploading)" value={classUrl} onChange={e => setClassUrl(e.target.value)} className="rounded-xl" />
+            <div className="text-center text-xs text-muted-foreground font-medium">— OR Upload Video File —</div>
+            <div onClick={() => classVideoRef.current?.click()} className="border-2 border-dashed border-primary/30 rounded-xl p-4 text-center cursor-pointer hover:border-primary/60">
+              <Video className="h-8 w-8 text-primary mx-auto mb-1" />
+              <p className="text-sm font-semibold">{classVideoFile ? classVideoFile.name : "Select Video File"}</p>
+              {classVideoFile && <p className="text-xs text-muted-foreground mt-1">{(classVideoFile.size / 1024 / 1024).toFixed(1)} MB</p>}
+            </div>
+            <input ref={classVideoRef} type="file" accept="video/*" onChange={e => setClassVideoFile(e.target.files?.[0] || null)} className="hidden" />
             <Input type="number" placeholder="Duration (min)" value={classDuration} onChange={e => setClassDuration(Number(e.target.value))} min={1} className="rounded-xl" />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddClass(false)}>Cancel</Button>
-            <Button onClick={handleAddClass} disabled={!classTitle.trim() || !classSubject || !classUrl.trim() || classAdding}>
+            <Button onClick={handleAddClass} disabled={!classTitle.trim() || !classSubject || (!classUrl.trim() && !classVideoFile) || classAdding}>
               {classAdding ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Add Class
             </Button>
           </DialogFooter>
