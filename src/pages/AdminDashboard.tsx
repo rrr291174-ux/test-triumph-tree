@@ -130,6 +130,8 @@ export default function AdminDashboard() {
   const [classUrl, setClassUrl] = useState("");
   const [classDuration, setClassDuration] = useState(60);
   const [classAdding, setClassAdding] = useState(false);
+  const [classVideoFile, setClassVideoFile] = useState<File | null>(null);
+  const classVideoRef = useRef<HTMLInputElement>(null);
 
   // ─── Objections state ───
   const [objections, setObjections] = useState<ObjectionItem[]>([]);
