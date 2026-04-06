@@ -395,12 +395,21 @@ export default function AdminDashboard() {
 
   // ─── Class handler ───
   const handleAddClass = async () => {
-    if (!classTitle.trim() || !classSubject || !classUrl.trim()) return;
+    if (!classTitle.trim() || !classSubject) return;
+    if (!classUrl.trim() && !classVideoFile) return;
     setClassAdding(true);
     try {
-      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: classUrl.trim(), duration_minutes: classDuration, created_by: user!.id, state: classState });
+      let videoUrl = classUrl.trim();
+      if (classVideoFile) {
+        const path = `classes/${classSubject}/${Date.now()}-${classVideoFile.name}`;
+        const { error: upErr } = await supabase.storage.from("materials").upload(path, classVideoFile);
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
+        videoUrl = urlData.publicUrl;
+      }
+      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: videoUrl, duration_minutes: classDuration, created_by: user!.id, state: classState });
       toast({ title: "✅ Class added!" });
-      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60);
+      setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60); setClassVideoFile(null);
       fetchClasses();
     } catch (err: any) {
       toast({ title: "❌ Failed", description: err.message, variant: "destructive" });
