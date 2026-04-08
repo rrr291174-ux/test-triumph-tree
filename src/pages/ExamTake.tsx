@@ -7,6 +7,7 @@ import { LockedContent } from "@/components/LockedContent";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Clock, BookOpen, CheckCircle, X, AlertTriangle } from "lucide-react";
 import ObjectionModal from "@/components/ObjectionModal";
+import { useFontSize } from "@/hooks/useFontSize";
 
 interface Question {
   id: string;
@@ -50,6 +51,7 @@ export default function ExamTake() {
   const { examId } = useParams();
   const { user } = useAuth();
   const { isApproved, loading: approvalLoading } = useApproval();
+  const { questionTextClass, optionTextClass } = useFontSize();
   const navigate = useNavigate();
 
   const [exam, setExam] = useState<ExamInfo | null>(null);
@@ -261,8 +263,8 @@ export default function ExamTake() {
         </div>
 
         {/* Question text */}
-        <div className="rounded-2xl p-5 mb-4 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 shadow-lg">
-          <p className="font-extrabold text-3xl text-white whitespace-pre-wrap leading-relaxed tracking-tight">
+        <div className="rounded-2xl p-4 sm:p-5 mb-4 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 shadow-lg">
+          <p className={`font-extrabold ${questionTextClass} text-white whitespace-pre-wrap leading-relaxed tracking-tight`}>
             {q.question_text}
           </p>
         </div>
@@ -296,7 +298,7 @@ export default function ExamTake() {
                   }`}>
                     {String.fromCharCode(97 + i)}
                   </span>
-                  <span className={`text-2xl font-bold leading-snug ${selected ? "text-white" : "text-foreground"}`}>
+                  <span className={`${optionTextClass} font-bold leading-snug ${selected ? "text-white" : "text-foreground"}`}>
                     {opt}
                   </span>
                   {selected && <CheckCircle className="h-5 w-5 text-white ml-auto shrink-0" />}
