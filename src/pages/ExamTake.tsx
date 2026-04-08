@@ -53,7 +53,6 @@ export default function ExamTake() {
   const { isApproved, loading: approvalLoading } = useApproval();
   const { questionTextClass, optionTextClass } = useFontSize();
   const navigate = useNavigate();
-  const navigate = useNavigate();
 
   const [exam, setExam] = useState<ExamInfo | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
