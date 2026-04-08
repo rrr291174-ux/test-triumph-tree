@@ -459,6 +459,39 @@ export type Database = {
           },
         ]
       }
+      shorts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          media_type: string
+          media_url: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          media_type?: string
+          media_url: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          media_type?: string
+          media_url?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subjects: {
         Row: {
           color: string | null

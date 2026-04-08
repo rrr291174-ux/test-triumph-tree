@@ -21,6 +21,7 @@ import AdminExams from "./pages/AdminExams";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Progress from "./pages/Progress";
+import Shorts from "./pages/Shorts";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
@@ -52,6 +53,7 @@ const App = () => (
                 <Route path="/admin/exams" element={<AdminExams />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/progress" element={<Progress />} />
+                <Route path="/shorts" element={<Shorts />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<NotFound />} />

@@ -1,11 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, MessageCircle, TrendingUp, Sun, Moon } from "lucide-react";
+import { Home, User, MessageCircle, Clapperboard, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 import logo from "@/assets/dk-logo.png";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
-  { to: "/progress", icon: TrendingUp, label: "Progress" },
+  { to: "/shorts", icon: Clapperboard, label: "Shorts" },
   { to: "/chat", icon: MessageCircle, label: "Chat" },
   { to: "/profile", icon: User, label: "Profile" },
 ];
