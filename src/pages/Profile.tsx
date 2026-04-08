@@ -22,7 +22,7 @@ export default function Profile() {
     { icon: TrendingUp, label: "Performance", desc: "Check your scores & ranks", to: "/progress" },
     { icon: CreditCard, label: "Payments", desc: "Transaction history" },
     { icon: ClipboardList, label: "Assignments", desc: "Pending assignments", badge: "2" },
-    { icon: Settings, label: "Settings", desc: "App preferences" },
+    { icon: Settings, label: "Settings", desc: "App preferences", to: "/settings" },
   ];
 
   const handleSignOut = async () => {
