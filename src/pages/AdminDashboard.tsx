@@ -101,7 +101,11 @@ export default function AdminDashboard() {
   const [foldersLoading, setFoldersLoading] = useState(true);
   const [matFilterState, setMatFilterState] = useState("");
   const [matFilterSubject, setMatFilterSubject] = useState("");
-  const [selectedFolder, setSelectedFolder] = useState<FolderItem | null>(null);
+
+  // Folder navigation path per tab (breadcrumb stack)
+  const [folderPaths, setFolderPaths] = useState<Record<"exams" | "material" | "classes", FolderItem[]>>({
+    exams: [], material: [], classes: [],
+  });
 
   // Create folder
   const [showCreateFolder, setShowCreateFolder] = useState(false);
@@ -121,6 +125,7 @@ export default function AdminDashboard() {
   // Delete folder
   const [deleteFolderTarget, setDeleteFolderTarget] = useState<FolderItem | null>(null);
   const [deletingFolder, setDeletingFolder] = useState(false);
+
 
   // ─── Classes state ───
   const [classes, setClasses] = useState<ClassItem[]>([]);
