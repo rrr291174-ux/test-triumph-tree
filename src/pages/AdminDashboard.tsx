@@ -1007,7 +1007,7 @@ export default function AdminDashboard() {
       {/* ═══ CREATE FOLDER DIALOG ═══ */}
       <Dialog open={showCreateFolder} onOpenChange={setShowCreateFolder}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Create Folder</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{currentFolder ? `New Sub-folder in "${currentFolder.name}"` : "Create Folder"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <label className="text-sm font-semibold text-foreground">1. Select State</label>
             <select value={newFolderState} onChange={e => setNewFolderState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
