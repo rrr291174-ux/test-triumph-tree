@@ -24,6 +24,7 @@ interface Exam {
   id: string; title: string; subject_id: string; state: string;
   duration_minutes: number | null; total_marks: number | null;
   is_published: boolean | null; created_at: string;
+  folder_id: string | null;
   subjects?: { name: string; slug: string } | null;
 }
 interface Material {
@@ -34,11 +35,13 @@ interface Material {
 interface ClassItem {
   id: string; title: string; description: string | null; subject_id: string;
   video_url: string | null; duration_minutes: number | null; is_published: boolean | null;
-  created_at: string; subjects?: { name: string } | null;
+  created_at: string; folder_id: string | null; subjects?: { name: string } | null;
 }
 interface FolderItem {
   id: string; name: string; subject_id: string; state: string; created_at: string;
+  parent_id: string | null; kind: string;
 }
+
 
 interface ObjectionItem {
   id: string;
