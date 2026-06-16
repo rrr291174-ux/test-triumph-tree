@@ -1035,7 +1035,7 @@ export default function AdminDashboard() {
       {/* ═══ UPLOAD FILES TO FOLDER DIALOG ═══ */}
       <Dialog open={showAddMaterial} onOpenChange={setShowAddMaterial}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Upload to "{selectedFolder?.name}"</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Upload to "{currentFolder?.name}"</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <Input placeholder="Title (optional, defaults to filename)" value={matTitle} onChange={e => setMatTitle(e.target.value)} className="rounded-xl" />
             <Input placeholder="Description (optional)" value={matDesc} onChange={e => setMatDesc(e.target.value)} className="rounded-xl" />
