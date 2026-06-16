@@ -86,6 +86,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           duration_minutes: number | null
+          folder_id: string | null
           id: string
           is_published: boolean | null
           state: string | null
@@ -100,6 +101,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -124,6 +127,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "classes_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "classes_subject_id_fkey"
             columns: ["subject_id"]
@@ -189,6 +199,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           duration_minutes: number | null
+          folder_id: string | null
           id: string
           is_published: boolean | null
           state: string | null
@@ -202,6 +213,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -215,6 +227,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           duration_minutes?: number | null
+          folder_id?: string | null
           id?: string
           is_published?: boolean | null
           state?: string | null
@@ -224,6 +237,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "exams_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "exams_subject_id_fkey"
             columns: ["subject_id"]
@@ -238,7 +258,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          kind: string
           name: string
+          parent_id: string | null
           state: string
           subject_id: string
         }
@@ -246,7 +268,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kind?: string
           name: string
+          parent_id?: string | null
           state?: string
           subject_id: string
         }
@@ -254,11 +278,20 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          kind?: string
           name?: string
+          parent_id?: string | null
           state?: string
           subject_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "folders_subject_id_fkey"
             columns: ["subject_id"]
