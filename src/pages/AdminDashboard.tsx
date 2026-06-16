@@ -316,11 +316,22 @@ export default function AdminDashboard() {
     reader.readAsText(file);
   };
 
+  // ─── Folder navigation helpers ───
+  const currentTabKey: "exams" | "material" | "classes" =
+    tab === "exams" ? "exams" : tab === "classes" ? "classes" : "material";
+  const currentPath = folderPaths[currentTabKey] || [];
+  const currentFolder: FolderItem | null = currentPath[currentPath.length - 1] || null;
+  const pushFolder = (f: FolderItem) =>
+    setFolderPaths(p => ({ ...p, [currentTabKey]: [...(p[currentTabKey] || []), f] }));
+  const popToFolder = (idx: number) =>
+    setFolderPaths(p => ({ ...p, [currentTabKey]: (p[currentTabKey] || []).slice(0, idx) }));
+
   const handleUpload = async () => {
     if (!jsonData || !uploadSubject || !uploadTitle.trim()) return;
     setUploading(true);
     try {
-      const { data: exam, error } = await supabase.from("exams").insert({ subject_id: uploadSubject, title: uploadTitle.trim(), duration_minutes: uploadDuration, total_marks: jsonData.length, created_by: user!.id, is_published: false, state: uploadState }).select("id").single();
+      const examFolderId = currentTabKey === "exams" && currentFolder?.subject_id === uploadSubject ? currentFolder.id : null;
+      const { data: exam, error } = await supabase.from("exams").insert({ subject_id: uploadSubject, title: uploadTitle.trim(), duration_minutes: uploadDuration, total_marks: jsonData.length, created_by: user!.id, is_published: false, state: uploadState, folder_id: examFolderId }).select("id").single();
       if (error) throw error;
       const BATCH = 100;
       for (let i = 0; i < jsonData.length; i += BATCH) {
@@ -342,11 +353,14 @@ export default function AdminDashboard() {
     if (!newFolderName.trim() || !newFolderSubject) return;
     setCreatingFolder(true);
     try {
+      const parentId = currentFolder && currentFolder.subject_id === newFolderSubject ? currentFolder.id : null;
       await supabase.from("folders").insert({
         name: newFolderName.trim(),
         subject_id: newFolderSubject,
         state: newFolderState,
         created_by: user!.id,
+        kind: currentTabKey === "exams" ? "exam" : currentTabKey === "classes" ? "class" : "material",
+        parent_id: parentId,
       });
       toast({ title: "📁 Folder created!" });
       setShowCreateFolder(false); setNewFolderName(""); setNewFolderSubject(""); setNewFolderState("both");
@@ -360,11 +374,18 @@ export default function AdminDashboard() {
   const handleDeleteFolder = async () => {
     if (!deleteFolderTarget) return;
     setDeletingFolder(true);
-    // Materials inside will be cascade deleted
     await supabase.from("folders").delete().eq("id", deleteFolderTarget.id);
     setFolders(p => p.filter(f => f.id !== deleteFolderTarget.id));
     setMaterials(p => p.filter(m => m.folder_id !== deleteFolderTarget.id));
-    if (selectedFolder?.id === deleteFolderTarget.id) setSelectedFolder(null);
+    // pop from path if deleted folder is in current path
+    setFolderPaths(p => {
+      const next = { ...p };
+      (Object.keys(next) as ("exams" | "material" | "classes")[]).forEach(k => {
+        const idx = next[k].findIndex(f => f.id === deleteFolderTarget.id);
+        if (idx >= 0) next[k] = next[k].slice(0, idx);
+      });
+      return next;
+    });
     setDeleteFolderTarget(null);
     setDeletingFolder(false);
     toast({ title: "🗑️ Folder deleted" });
@@ -372,25 +393,25 @@ export default function AdminDashboard() {
 
   // ─── Material handler (into folder) ───
   const handleAddMaterial = async () => {
-    if (!selectedFolder || matFiles.length === 0) return;
+    if (!currentFolder || matFiles.length === 0) return;
     setMatUploading(true);
     try {
       for (const file of matFiles) {
         const ext = file.name.split('.').pop();
-        const path = `${selectedFolder.subject_id}/${selectedFolder.id}/${Date.now()}-${file.name}`;
+        const path = `${currentFolder.subject_id}/${currentFolder.id}/${Date.now()}-${file.name}`;
         const { error: upErr } = await supabase.storage.from("materials").upload(path, file);
         if (upErr) throw upErr;
         const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
         const title = matTitle.trim() ? (matFiles.length === 1 ? matTitle.trim() : `${matTitle.trim()} - ${file.name}`) : file.name;
         await supabase.from("materials").insert({
-          subject_id: selectedFolder.subject_id,
+          subject_id: currentFolder.subject_id,
           title,
           description: matDesc.trim() || null,
           file_url: urlData.publicUrl,
           file_type: ext,
           created_by: user!.id,
-          state: selectedFolder.state,
-          folder_id: selectedFolder.id,
+          state: currentFolder.state,
+          folder_id: currentFolder.id,
         });
       }
       toast({ title: `✅ ${matFiles.length} file(s) uploaded!` });
@@ -416,8 +437,10 @@ export default function AdminDashboard() {
         const { data: urlData } = supabase.storage.from("materials").getPublicUrl(path);
         videoUrl = urlData.publicUrl;
       }
-      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: videoUrl, duration_minutes: classDuration, created_by: user!.id, state: classState });
+      const classFolderId = currentTabKey === "classes" && currentFolder?.subject_id === classSubject ? currentFolder.id : null;
+      await supabase.from("classes").insert({ subject_id: classSubject, title: classTitle.trim(), description: classDesc.trim() || null, video_url: videoUrl, duration_minutes: classDuration, created_by: user!.id, state: classState, folder_id: classFolderId });
       toast({ title: "✅ Class added!" });
+
       setShowAddClass(false); setClassTitle(""); setClassDesc(""); setClassSubject(""); setClassState("both"); setClassUrl(""); setClassDuration(60); setClassVideoFile(null);
       fetchClasses();
     } catch (err: any) {
