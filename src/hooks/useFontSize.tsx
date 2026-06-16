@@ -9,10 +9,21 @@ interface FontSizeContextType {
   optionTextClass: string;
 }
 
+// Fluid sizes using clamp(min, vw-based, max) so they scale smoothly
+// between mobile and desktop without any breakpoint jumps.
 const sizeMap: Record<FontSize, { question: string; option: string }> = {
-  small:  { question: "text-base sm:text-lg",   option: "text-sm sm:text-base" },
-  medium: { question: "text-lg sm:text-xl",     option: "text-base sm:text-lg" },
-  large:  { question: "text-xl sm:text-2xl",    option: "text-lg sm:text-xl"   },
+  small:  {
+    question: "text-[clamp(0.8rem,2.6vw,0.95rem)] leading-snug",
+    option:   "text-[clamp(0.75rem,2.3vw,0.85rem)] leading-snug",
+  },
+  medium: {
+    question: "text-[clamp(0.9rem,3vw,1.1rem)] leading-snug",
+    option:   "text-[clamp(0.8rem,2.6vw,1rem)] leading-snug",
+  },
+  large:  {
+    question: "text-[clamp(1rem,3.4vw,1.25rem)] leading-snug",
+    option:   "text-[clamp(0.9rem,3vw,1.1rem)] leading-snug",
+  },
 };
 
 const FontSizeContext = createContext<FontSizeContextType | undefined>(undefined);
