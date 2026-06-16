@@ -971,7 +971,7 @@ export default function AdminDashboard() {
       {/* ═══ UPLOAD EXAM DIALOG ═══ */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Upload Exam (JSON)</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{currentFolder && tab === "exams" ? `Upload Exam to "${currentFolder.name}"` : "Upload Exam (JSON)"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <label className="text-sm font-semibold text-foreground">1. Select State</label>
             <select value={uploadState} onChange={e => setUploadState(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm">
