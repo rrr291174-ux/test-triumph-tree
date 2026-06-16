@@ -197,7 +197,7 @@ export default function AdminDashboard() {
     setExamsLoading(true);
     const { data } = await supabase
       .from("exams")
-      .select("id, title, subject_id, state, duration_minutes, total_marks, is_published, created_at, subjects(name, slug)")
+      .select("id, title, subject_id, state, duration_minutes, total_marks, is_published, created_at, folder_id, subjects(name, slug)")
       .order("created_at", { ascending: false });
     setExams((data as Exam[]) || []);
     setExamsLoading(false);
@@ -208,7 +208,7 @@ export default function AdminDashboard() {
     setFoldersLoading(true);
     const { data } = await supabase
       .from("folders")
-      .select("id, name, subject_id, state, created_at")
+      .select("id, name, subject_id, state, created_at, parent_id, kind")
       .order("created_at", { ascending: false });
     setFolders((data as FolderItem[]) || []);
     setFoldersLoading(false);
@@ -230,11 +230,12 @@ export default function AdminDashboard() {
     setClassesLoading(true);
     const { data } = await supabase
       .from("classes")
-      .select("id, title, description, subject_id, video_url, duration_minutes, is_published, created_at, subjects(name)")
+      .select("id, title, description, subject_id, video_url, duration_minutes, is_published, created_at, folder_id, subjects(name)")
       .order("created_at", { ascending: false });
     setClasses((data as ClassItem[]) || []);
     setClassesLoading(false);
   };
+
 
   // Load objections
   const fetchObjections = async () => {
